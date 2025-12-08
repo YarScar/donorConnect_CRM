@@ -84,15 +84,17 @@ export default function DonorsPage() {
                 <td>{donor.donorType}</td>
                 <td>${calculateTotal(donor.donations)}</td>
                 <td>
-                  <Link href={`/donors/${donor.id}`} className="btn btn-secondary" style={{marginRight: '10px'}}>
-                    View
-                  </Link>
-                  <button 
-                    onClick={() => handleDelete(donor.id)} 
-                    className="btn btn-danger"
-                  >
-                    Delete
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <Link href={`/donors/${donor.id}`} className="btn btn-secondary">
+                      View
+                    </Link>
+                    <button 
+                      onClick={() => handleDelete(donor.id)} 
+                      className="btn btn-danger"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

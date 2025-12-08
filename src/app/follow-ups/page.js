@@ -102,21 +102,22 @@ export default function FollowUpsPage() {
                   </span>
                 </td>
                 <td>
-                  {followUp.status !== 'Completed' && (
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {followUp.status !== 'Completed' && (
+                      <button 
+                        onClick={() => handleComplete(followUp.id)} 
+                        className="btn btn-success"
+                      >
+                        Complete
+                      </button>
+                    )}
                     <button 
-                      onClick={() => handleComplete(followUp.id)} 
-                      className="btn btn-success"
-                      style={{marginRight: '10px'}}
+                      onClick={() => handleDelete(followUp.id)} 
+                      className="btn btn-danger"
                     >
-                      Complete
+                      Delete
                     </button>
-                  )}
-                  <button 
-                    onClick={() => handleDelete(followUp.id)} 
-                    className="btn btn-danger"
-                  >
-                    Delete
-                  </button>
+                  </div>
                 </td>
               </tr>
             ))}
