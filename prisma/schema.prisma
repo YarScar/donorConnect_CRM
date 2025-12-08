@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Donor {
+  id            Int          @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  email         String?      @unique
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?
+  notes         String?
+  donorType     String?      // Individual, Organization, Foundation
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  donations     Donation[]
+  followUps     FollowUp[]
+}
+
+model Campaign {
+  id            Int          @id @default(autoincrement())
+  name          String
+  description   String?
+  goalAmount    Float?
+  startDate     DateTime?
+  endDate       DateTime?
+  status        String       @default("Active") // Active, Completed, Cancelled
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  donations     Donation[]
+}
+
+model Event {
+  id            Int          @id @default(autoincrement())
+  name          String
+  description   String?
+  eventDate     DateTime
+  location      String?
+  capacity      Int?
+  attendees     Int?
+  status        String       @default("Upcoming") // Upcoming, In Progress, Completed, Cancelled
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  donations     Donation[]
+}
+
+model Donation {
+  id            Int          @id @default(autoincrement())
+  amount        Float
+  donationDate  DateTime     @default(now())
+  paymentMethod String?      // Check, Cash, Credit Card, Bank Transfer, Online
+  status        String       @default("Completed") // Completed, Pending, Cancelled
+  notes         String?
+  isRecurring   Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  donorId       Int
+  donor         Donor        @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  campaignId    Int?
+  campaign      Campaign?    @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  eventId       Int?
+  event         Event?       @relation(fields: [eventId], references: [id], onDelete: SetNull)
+}
+
+model FollowUp {
+  id            Int          @id @default(autoincrement())
+  title         String
+  description   String?
+  dueDate       DateTime
+  status        String       @default("Pending") // Pending, In Progress, Completed, Cancelled
+  priority      String       @default("Medium") // Low, Medium, High
+  type          String?      // Thank You, Follow-up Call, Email, Meeting
+  completedAt   DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  donorId       Int
+  donor         Donor        @relation(fields: [donorId], references: [id], onDelete: Cascade)
+}
