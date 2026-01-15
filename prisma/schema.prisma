@@ -1,89 +1,146 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Donor {
-  id            Int          @id @default(autoincrement())
-  firstName     String
-  lastName      String
-  email         String?      @unique
-  phone         String?
-  address       String?
-  city          String?
-  state         String?
-  zipCode       String?
-  notes         String?
-  donorType     String?      // Individual, Organization, Foundation
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  donations     Donation[]
-  followUps     FollowUp[]
+  id               Int               @id @default(autoincrement())
+  firstName        String
+  lastName         String
+  email            String?           @unique
+  phone            String?
+  address          String?
+  city             String?
+  state            String?
+  zipCode          String?
+  country          String?           @default("USA")
+  notes            String?
+  donorType        String            @default("Individual")
+  preferredContact String?           @default("Email")
+  totalDonated     Float             @default(0)
+  lastDonation     DateTime?
+  isActive         Boolean           @default(true)
+  tags             String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  donations        Donation[]
+  eventAttendances EventAttendance[]
+  followUps        FollowUp[]
+
+  @@index([email])
+  @@index([lastName, firstName])
 }
 
 model Campaign {
-  id            Int          @id @default(autoincrement())
-  name          String
-  description   String?
-  goalAmount    Float?
-  startDate     DateTime?
-  endDate       DateTime?
-  status        String       @default("Active") // Active, Completed, Cancelled
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  donations     Donation[]
+  id           Int        @id @default(autoincrement())
+  name         String
+  description  String?
+  goalAmount   Float?
+  raisedAmount Float      @default(0)
+  startDate    DateTime?
+  endDate      DateTime?
+  status       String     @default("Active")
+  campaignType String?    @default("General")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  donations    Donation[]
+
+  @@index([status])
+  @@index([startDate, endDate])
 }
 
 model Event {
-  id            Int          @id @default(autoincrement())
-  name          String
-  description   String?
-  eventDate     DateTime
-  location      String?
-  capacity      Int?
-  attendees     Int?
-  status        String       @default("Upcoming") // Upcoming, In Progress, Completed, Cancelled
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  donations     Donation[]
+  id          Int               @id @default(autoincrement())
+  name        String
+  description String?
+  eventDate   DateTime
+  location    String?
+  capacity    Int?
+  attendees   Int?              @default(0)
+  ticketPrice Float?
+  status      String            @default("Upcoming")
+  eventType   String?           @default("Fundraising")
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  donations   Donation[]
+  attendances EventAttendance[]
+
+  @@index([eventDate])
+  @@index([status])
+}
+
+model EventAttendance {
+  id        Int      @id @default(autoincrement())
+  eventId   Int
+  donorId   Int
+  attended  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  donor     Donor    @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, donorId])
 }
 
 model Donation {
-  id            Int          @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   amount        Float
-  donationDate  DateTime     @default(now())
-  paymentMethod String?      // Check, Cash, Credit Card, Bank Transfer, Online
-  status        String       @default("Completed") // Completed, Pending, Cancelled
+  donationDate  DateTime  @default(now())
+  paymentMethod String?   @default("Cash")
+  status        String    @default("Completed")
   notes         String?
-  isRecurring   Boolean      @default(false)
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  isRecurring   Boolean   @default(false)
+  recurringType String?
+  receiptSent   Boolean   @default(false)
+  taxDeductible Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   donorId       Int
-  donor         Donor        @relation(fields: [donorId], references: [id], onDelete: Cascade)
   campaignId    Int?
-  campaign      Campaign?    @relation(fields: [campaignId], references: [id], onDelete: SetNull)
   eventId       Int?
-  event         Event?       @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  event         Event?    @relation(fields: [eventId], references: [id])
+  campaign      Campaign? @relation(fields: [campaignId], references: [id])
+  donor         Donor     @relation(fields: [donorId], references: [id], onDelete: Cascade)
+
+  @@index([donorId])
+  @@index([donationDate])
+  @@index([status])
+  @@index([campaignId])
 }
 
 model FollowUp {
-  id            Int          @id @default(autoincrement())
-  title         String
-  description   String?
-  dueDate       DateTime
-  status        String       @default("Pending") // Pending, In Progress, Completed, Cancelled
-  priority      String       @default("Medium") // Low, Medium, High
-  type          String?      // Thank You, Follow-up Call, Email, Meeting
-  completedAt   DateTime?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  donorId       Int
-  donor         Donor        @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  dueDate     DateTime
+  status      String    @default("Pending")
+  priority    String    @default("Medium")
+  type        String?   @default("General")
+  completedAt DateTime?
+  assignedTo  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  donorId     Int
+  donor       Donor     @relation(fields: [donorId], references: [id], onDelete: Cascade)
+
+  @@index([donorId])
+  @@index([dueDate])
+  @@index([status])
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  action     String
+  entityType String
+  entityId   Int
+  userId     String?
+  oldValues  String?
+  newValues  String?
+  timestamp  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([timestamp])
 }

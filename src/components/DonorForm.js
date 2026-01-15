@@ -15,7 +15,10 @@ export default function DonorForm({ donor = null, onSuccess }) {
     city: donor?.city || '',
     state: donor?.state || '',
     zipCode: donor?.zipCode || '',
+    country: donor?.country || 'USA',
     donorType: donor?.donorType || 'Individual',
+    preferredContact: donor?.preferredContact || 'Email',
+    tags: donor?.tags || '',
     notes: donor?.notes || ''
   })
 
@@ -148,6 +151,17 @@ export default function DonorForm({ donor = null, onSuccess }) {
       </div>
 
       <div className="form-group">
+        <label className="form-label">Country</label>
+        <input
+          type="text"
+          name="country"
+          className="form-input"
+          value={formData.country}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="form-group">
         <label className="form-label">Donor Type</label>
         <select
           name="donorType"
@@ -158,7 +172,35 @@ export default function DonorForm({ donor = null, onSuccess }) {
           <option value="Individual">Individual</option>
           <option value="Organization">Organization</option>
           <option value="Foundation">Foundation</option>
+          <option value="Corporation">Corporation</option>
         </select>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Preferred Contact Method</label>
+        <select
+          name="preferredContact"
+          className="form-select"
+          value={formData.preferredContact}
+          onChange={handleChange}
+        >
+          <option value="Email">Email</option>
+          <option value="Phone">Phone</option>
+          <option value="Mail">Mail</option>
+          <option value="Text">Text</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Tags (comma-separated)</label>
+        <input
+          type="text"
+          name="tags"
+          className="form-input"
+          value={formData.tags}
+          onChange={handleChange}
+          placeholder="e.g. major-donor, recurring, board-member"
+        />
       </div>
 
       <div className="form-group">

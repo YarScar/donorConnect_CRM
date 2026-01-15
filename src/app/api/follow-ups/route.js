@@ -6,11 +6,27 @@ export async function GET() {
   try {
     const followUps = await prisma.followUp.findMany({
       include: {
-        donor: true
+        donor: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+            donorType: true,
+            totalDonated: true,
+            lastDonation: true
+          }
+        }
       },
-      orderBy: {
-        dueDate: 'asc'
-      }
+      orderBy: [
+        {
+          status: 'asc' // Pending items first
+        },
+        {
+          dueDate: 'asc' // Then by due date
+        }
+      ]
     })
     return NextResponse.json(followUps)
   } catch (error) {

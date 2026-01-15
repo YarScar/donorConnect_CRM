@@ -4,6 +4,15 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('Seeding database...')
 
+  // Clear existing data
+  await prisma.auditLog.deleteMany()
+  await prisma.eventAttendance.deleteMany()
+  await prisma.followUp.deleteMany()
+  await prisma.donation.deleteMany()
+  await prisma.event.deleteMany()
+  await prisma.campaign.deleteMany()
+  await prisma.donor.deleteMany()
+
   // Create sample donors
   const donor1 = await prisma.donor.create({
     data: {
@@ -15,7 +24,13 @@ async function main() {
       city: 'Springfield',
       state: 'IL',
       zipCode: '62701',
+      country: 'USA',
       donorType: 'Individual',
+      preferredContact: 'Email',
+      totalDonated: 750,
+      lastDonation: new Date('2024-11-01'),
+      isActive: true,
+      tags: 'recurring,email-preferred',
       notes: 'Regular donor, prefers email contact'
     }
   })
@@ -30,7 +45,13 @@ async function main() {
       city: 'Springfield',
       state: 'IL',
       zipCode: '62702',
-      donorType: 'Individual'
+      country: 'USA',
+      donorType: 'Individual',
+      preferredContact: 'Phone',
+      totalDonated: 1000,
+      lastDonation: new Date('2024-06-20'),
+      isActive: true,
+      tags: 'major-donor'
     }
   })
 
@@ -44,7 +65,13 @@ async function main() {
       city: 'Chicago',
       state: 'IL',
       zipCode: '60601',
+      country: 'USA',
       donorType: 'Foundation',
+      preferredContact: 'Email',
+      totalDonated: 5000,
+      lastDonation: new Date('2024-10-15'),
+      isActive: true,
+      tags: 'foundation,major-donor',
       notes: 'Large annual contributor'
     }
   })
@@ -55,9 +82,11 @@ async function main() {
       name: 'Annual Fund 2024',
       description: 'General operating support for 2024',
       goalAmount: 50000,
+      raisedAmount: 1500,
       startDate: new Date('2024-01-01'),
       endDate: new Date('2024-12-31'),
-      status: 'Active'
+      status: 'Active',
+      campaignType: 'General'
     }
   })
 
@@ -66,9 +95,11 @@ async function main() {
       name: 'Building Renovation',
       description: 'Funds for facility improvements',
       goalAmount: 100000,
+      raisedAmount: 250,
       startDate: new Date('2024-06-01'),
       endDate: new Date('2025-06-01'),
-      status: 'Active'
+      status: 'Active',
+      campaignType: 'Capital'
     }
   })
 
@@ -81,7 +112,18 @@ async function main() {
       location: 'Grand Hotel Ballroom',
       capacity: 200,
       attendees: 150,
-      status: 'Completed'
+      ticketPrice: 100,
+      status: 'Completed',
+      eventType: 'Fundraising'
+    }
+  })
+
+  // Create event attendance records
+  await prisma.eventAttendance.create({
+    data: {
+      eventId: event1.id,
+      donorId: donor3.id,
+      attended: true
     }
   })
 
@@ -92,6 +134,8 @@ async function main() {
       donationDate: new Date('2024-03-15'),
       paymentMethod: 'Credit Card',
       status: 'Completed',
+      receiptSent: true,
+      taxDeductible: true,
       donorId: donor1.id,
       campaignId: campaign1.id
     }
@@ -103,6 +147,8 @@ async function main() {
       donationDate: new Date('2024-06-20'),
       paymentMethod: 'Check',
       status: 'Completed',
+      receiptSent: true,
+      taxDeductible: true,
       donorId: donor2.id,
       campaignId: campaign1.id
     }
@@ -114,6 +160,8 @@ async function main() {
       donationDate: new Date('2024-10-15'),
       paymentMethod: 'Bank Transfer',
       status: 'Completed',
+      receiptSent: true,
+      taxDeductible: true,
       donorId: donor3.id,
       eventId: event1.id
     }
@@ -126,6 +174,9 @@ async function main() {
       paymentMethod: 'Online',
       status: 'Completed',
       isRecurring: true,
+      recurringType: 'Monthly',
+      receiptSent: true,
+      taxDeductible: true,
       donorId: donor1.id,
       campaignId: campaign2.id
     }
@@ -140,6 +191,7 @@ async function main() {
       status: 'Completed',
       priority: 'High',
       type: 'Thank You',
+      assignedTo: 'Development Manager',
       completedAt: new Date('2024-10-19'),
       donorId: donor3.id
     }
@@ -153,6 +205,7 @@ async function main() {
       status: 'Pending',
       priority: 'High',
       type: 'Meeting',
+      assignedTo: 'Executive Director',
       donorId: donor3.id
     }
   })
@@ -165,7 +218,18 @@ async function main() {
       status: 'Pending',
       priority: 'Medium',
       type: 'Email',
+      assignedTo: 'Development Coordinator',
       donorId: donor1.id
+    }
+  })
+
+  // Create audit log entries
+  await prisma.auditLog.create({
+    data: {
+      action: 'CREATE',
+      entityType: 'Donation',
+      entityId: 1,
+      newValues: JSON.stringify({ amount: 5000, donorId: donor3.id, eventId: event1.id })
     }
   })
 

@@ -6,17 +6,35 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:db": "vitest run --config vitest.config.db.js",
+    "test:ai": "vitest run --config vitest.config.ai.js",
+    "db:test:setup": "cross-env NODE_ENV=test npx prisma migrate dev && npx prisma db seed"
   },
   "dependencies": {
+    "@prisma/client": "^5.7.0",
+    "next": "^14.0.0",
+    "openai": "^4.104.0",
+    "prisma": "^5.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "next": "^14.0.0",
-    "prisma": "^5.7.0",
-    "@prisma/client": "^5.7.0"
+    "recharts": "^2.15.4"
   },
   "devDependencies": {
+    "@testing-library/dom": "^9.3.4",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.1",
+    "@vitejs/plugin-react": "^4.2.1",
+    "cross-env": "^7.0.3",
     "eslint": "^8.54.0",
-    "eslint-config-next": "^14.0.0"
+    "eslint-config-next": "^14.0.0",
+    "jsdom": "^23.2.0",
+    "supertest": "^6.3.3",
+    "vitest": "^1.2.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }

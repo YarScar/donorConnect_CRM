@@ -6,13 +6,35 @@ export async function GET() {
   try {
     const campaigns = await prisma.campaign.findMany({
       include: {
-        donations: true
+        donations: {
+          include: {
+            donor: {
+              select: {
+                firstName: true,
+                lastName: true,
+                email: true
+              }
+            }
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc'
       }
     })
-    return NextResponse.json(campaigns)
+    
+    // Calculate actual raised amounts
+    const campaignsWithCalculations = campaigns.map(campaign => ({
+      ...campaign,
+      actualRaised: campaign.donations.reduce((sum, donation) => 
+        donation.status === 'Completed' ? sum + donation.amount : sum, 0
+      ),
+      donorCount: new Set(campaign.donations
+        .filter(d => d.status === 'Completed')
+        .map(d => d.donorId)).size
+    }))
+    
+    return NextResponse.json(campaignsWithCalculations)
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch campaigns' }, { status: 500 })
   }

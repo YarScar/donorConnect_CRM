@@ -30,13 +30,40 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     const data = await request.json()
+    
+    console.log('Updating donor with ID:', params.id, 'Data:', data)
+    
+    // Filter out undefined values and handle new schema fields
+    const updateData = Object.fromEntries(
+      Object.entries(data).filter(([key, value]) => value !== undefined)
+    )
+    
     const donor = await prisma.donor.update({
       where: { id: parseInt(params.id) },
-      data
+      data: updateData,
+      include: {
+        donations: {
+          orderBy: { donationDate: 'desc' }
+        },
+        followUps: {
+          orderBy: { dueDate: 'desc' }
+        },
+        eventAttendances: {
+          include: {
+            event: true
+          }
+        }
+      }
     })
+    
+    console.log('Successfully updated donor:', donor.id)
     return NextResponse.json(donor)
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to update donor' }, { status: 500 })
+    console.error('Error updating donor:', error)
+    return NextResponse.json({ 
+      error: 'Failed to update donor', 
+      details: error.message 
+    }, { status: 500 })
   }
 }
 
