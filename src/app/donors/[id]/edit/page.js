@@ -10,10 +10,7 @@ export default function EditDonorPage({ params }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchDonor()
-  }, [])
-
-  const fetchDonor = async () => {
+    const fetchDonor = async () => {
     try {
       const response = await fetch(`/api/donors/${params.id}`)
       const data = await response.json()
@@ -23,7 +20,9 @@ export default function EditDonorPage({ params }) {
     } finally {
       setLoading(false)
     }
-  }
+    }
+    fetchDonor()
+  }, [params.id])
 
   if (loading) return <div className="container"><LoadingSpinner /></div>
 

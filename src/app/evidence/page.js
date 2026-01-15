@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 
@@ -126,8 +128,8 @@ export default function Evidence() {
 
           <div className="evidence-card">
             <h3>🗄️ Data Persistence Evidence</h3>
-            <div class="evidence-content">
-              <div class="database-info">
+            <div className="evidence-content">
+              <div className="database-info">
                 <h4>Database Implementation</h4>
                 <ul>
                   <li>✅ <strong>Prisma ORM</strong> with SQLite database for development</li>
@@ -136,7 +138,7 @@ export default function Evidence() {
                   <li>✅ <strong>API endpoints</strong> for all CRUD operations</li>
                   <li>✅ <strong>Data validation</strong> and error handling</li>
                 </ul>
-                <div class="tech-details">
+                <div className="tech-details">
                   <p><strong>Schema Location:</strong> <code>/prisma/schema.prisma</code></p>
                   <p><strong>API Routes:</strong> <code>/src/app/api/*</code></p>
                   <p><strong>Database Models:</strong> Donor, Donation, Campaign, Event, FollowUp</p>
@@ -145,10 +147,10 @@ export default function Evidence() {
             </div>
           </div>
 
-          <div class="evidence-card">
+          <div className="evidence-card">
             <h3>🔐 Role-Based Access Evidence</h3>
-            <div class="evidence-content">
-              <div class="admin-features">
+            <div className="evidence-content">
+              <div className="admin-features">
                 <h4>Administrator-Only Features</h4>
                 <ul>
                   <li>✅ <strong>Delete Donors:</strong> Only admins can permanently delete donor records</li>
@@ -157,7 +159,7 @@ export default function Evidence() {
                   <li>✅ <strong>Confirmation Dialogs:</strong> Extra security for destructive actions</li>
                   <li>✅ <strong>Audit Trail Capability:</strong> Admin actions can be logged and tracked</li>
                 </ul>
-                <div class="demo-note">
+                <div className="demo-note">
                   <p><em>Note: For demonstration purposes, admin access is enabled. In production, this would be controlled by authentication and user roles.</em></p>
                 </div>
               </div>
@@ -165,14 +167,14 @@ export default function Evidence() {
           </div>
         </section>
 
-        <section class="ts6-2-evidence">
-          <h2 class="evidence-section-title">⚖️ TS.6.2 Evidence - Responsible AI Use</h2>
+        <section className="ts6-2-evidence">
+          <h2 className="evidence-section-title">⚖️ TS.6.2 Evidence - Responsible AI Use</h2>
           
-          <div class="evidence-card">
+          <div className="evidence-card">
             <h3>🛡️ Responsible AI Implementation</h3>
-            <div class="evidence-content">
-              <div class="responsible-ai-grid">
-                <div class="responsibility-item">
+            <div className="evidence-content">
+              <div className="responsible-ai-grid">
+                <div className="responsibility-item">
                   <h4>🔍 Transparency</h4>
                   <ul>
                     <li>✅ All AI recommendations clearly labeled</li>
@@ -180,12 +182,12 @@ export default function Evidence() {
                     <li>✅ AI confidence levels displayed</li>
                     <li>✅ Data sources cited for analysis</li>
                   </ul>
-                  <div class="evidence-links">
-                    <Link href="/ai-policy" class="evidence-link">View AI Policy →</Link>
+                  <div className="evidence-links">
+                    <Link href="/ai-policy" className="evidence-link">View AI Policy →</Link>
                   </div>
                 </div>
 
-                <div class="responsibility-item">
+                <div className="responsibility-item">
                   <h4>👤 Human Oversight</h4>
                   <ul>
                     <li>✅ AI provides suggestions only, never makes decisions</li>
@@ -195,7 +197,7 @@ export default function Evidence() {
                   </ul>
                 </div>
 
-                <div class="responsibility-item">
+                <div className="responsibility-item">
                   <h4>🔒 Privacy Protection</h4>
                   <ul>
                     <li>✅ No PII sent to external AI services</li>
@@ -205,7 +207,7 @@ export default function Evidence() {
                   </ul>
                 </div>
 
-                <div class="responsibility-item">
+                <div className="responsibility-item">
                   <h4>⚖️ Ethical Guidelines</h4>
                   <ul>
                     <li>✅ Bias detection and prevention measures</li>
@@ -219,49 +221,49 @@ export default function Evidence() {
           </div>
         </section>
 
-        <section class="ts6-3-evidence">
-          <h2 class="evidence-section-title">🤖 TS.6.3 Evidence - AI Integration in Workflow/Product</h2>
+        <section className="ts6-3-evidence">
+          <h2 className="evidence-section-title">🤖 TS.6.3 Evidence - AI Integration in Workflow/Product</h2>
           
-          <div class="evidence-card">
+          <div className="evidence-card">
             <h3>🔧 AI Implementation Details</h3>
-            <div class="evidence-content">
-              <div class="ai-implementation">
-                <div class="ai-feature">
+            <div className="evidence-content">
+              <div className="ai-implementation">
+                <div className="ai-feature">
                   <h4>🧠 OpenAI Integration</h4>
                   <p><strong>Model:</strong> GPT-3.5 Turbo</p>
                   <p><strong>Purpose:</strong> Donor analysis and engagement strategy generation</p>
                   <p><strong>Implementation:</strong> REST API integration with secure prompt engineering</p>
-                  <div class="evidence-links">
-                    <Link href="/donors" class="evidence-link">Try AI Donor Analysis →</Link>
+                  <div className="evidence-links">
+                    <Link href="/donors" className="evidence-link">Try AI Donor Analysis →</Link>
                   </div>
-                  <div class="code-location">
+                  <div className="code-location">
                     <p><strong>Code Location:</strong> <code>/src/app/api/ai/donor-analysis/route.js</code></p>
                   </div>
                 </div>
 
-                <div class="ai-feature">
+                <div className="ai-feature">
                   <h4>📊 AI-Powered Dashboard Insights</h4>
                   <p><strong>Function:</strong> Automated donor engagement trend analysis</p>
                   <p><strong>Implementation:</strong> Real-time pattern recognition and recommendation generation</p>
-                  <div class="evidence-links">
-                    <Link href="/dashboard" class="evidence-link">View AI Dashboard Insights →</Link>
+                  <div className="evidence-links">
+                    <Link href="/dashboard" className="evidence-link">View AI Dashboard Insights →</Link>
                   </div>
                 </div>
 
-                <div class="ai-feature">
+                <div className="ai-feature">
                   <h4>🎯 Risk Assessment Algorithm</h4>
                   <p><strong>Function:</strong> Automated donor lapse risk calculation</p>
                   <p><strong>Implementation:</strong> Local algorithm based on giving patterns and engagement history</p>
-                  <div class="ai-logic">
+                  <div className="ai-logic">
                     <p><strong>Logic:</strong> Days since last donation + giving frequency + engagement level = Risk Score</p>
                   </div>
                 </div>
 
-                <div class="ai-feature">
+                <div className="ai-feature">
                   <h4>💡 Personalized Recommendations</h4>
                   <p><strong>Types:</strong> Engagement strategies, upgrade potential, retention tactics</p>
                   <p><strong>Customization:</strong> Tailored to each donor's giving history and behavior patterns</p>
-                  <div class="ai-examples">
+                  <div className="ai-examples">
                     <p><strong>Example Outputs:</strong></p>
                     <ul>
                       <li>Optimal ask amounts based on giving history</li>
@@ -275,10 +277,10 @@ export default function Evidence() {
             </div>
           </div>
 
-          <div class="evidence-card">
+          <div className="evidence-card">
             <h3>🛠️ Development Workflow AI Integration</h3>
-            <div class="evidence-content">
-              <div class="workflow-integration">
+            <div className="evidence-content">
+              <div className="workflow-integration">
                 <h4>AI-Assisted Development Process</h4>
                 <ul>
                   <li>✅ <strong>Code Generation:</strong> AI assistance for component creation and API development</li>
@@ -292,19 +294,19 @@ export default function Evidence() {
           </div>
         </section>
 
-        <section class="deployment-evidence">
-          <h2 class="evidence-section-title">🚀 Deployment & Accessibility Evidence</h2>
+        <section className="deployment-evidence">
+          <h2 className="evidence-section-title">🚀 Deployment & Accessibility Evidence</h2>
           
-          <div class="evidence-card">
+          <div className="evidence-card">
             <h3>🌐 Live Deployment Information</h3>
-            <div class="evidence-content">
-              <div class="deployment-details">
-                <div class="deployment-item">
+            <div className="evidence-content">
+              <div className="deployment-details">
+                <div className="deployment-item">
                   <h4>🔗 Vercel Deployment</h4>
                   <p><strong>Platform:</strong> Vercel (Next.js optimized hosting)</p>
                   <p><strong>Status:</strong> Live and publicly accessible</p>
                   <p><strong>URL:</strong> <em>Will be provided upon deployment</em></p>
-                  <div class="deployment-features">
+                  <div className="deployment-features">
                     <ul>
                       <li>✅ Automatic SSL/HTTPS</li>
                       <li>✅ Global CDN distribution</li>
@@ -314,7 +316,7 @@ export default function Evidence() {
                   </div>
                 </div>
 
-                <div class="deployment-item">
+                <div className="deployment-item">
                   <h4>📱 Responsive Design</h4>
                   <p>Mobile-friendly design ensuring accessibility across all devices</p>
                   <ul>
@@ -329,68 +331,68 @@ export default function Evidence() {
           </div>
         </section>
 
-        <section class="links-section">
-          <h2 class="evidence-section-title">🔗 Direct Links to Key Resources</h2>
+        <section className="links-section">
+          <h2 className="evidence-section-title">🔗 Direct Links to Key Resources</h2>
           
-          <div class="evidence-card">
+          <div className="evidence-card">
             <h3>📋 Assessment Support Links</h3>
-            <div class="evidence-content">
-              <div class="links-grid">
-                <div class="link-category">
+            <div className="evidence-content">
+              <div className="links-grid">
+                <div className="link-category">
                   <h4>🔧 Technical Implementation</h4>
-                  <div class="link-list">
-                    <Link href="https://github.com/your-username/donorconnect-crm" class="external-link" target="_blank">
+                  <div className="link-list">
+                    <Link href="https://github.com/your-username/donorconnect-crm" className="external-link" target="_blank">
                       📂 GitHub Repository →
                     </Link>
-                    <Link href="/" class="evidence-link">
+                    <Link href="/" className="evidence-link">
                       🏠 Live Application Home →
                     </Link>
-                    <Link href="/dashboard" class="evidence-link">
+                    <Link href="/dashboard" className="evidence-link">
                       📊 Working Dashboard →
                     </Link>
                   </div>
                 </div>
 
-                <div class="link-category">
+                <div className="link-category">
                   <h4>📚 Documentation</h4>
-                  <div class="link-list">
-                    <Link href="/about" class="evidence-link">
+                  <div className="link-list">
+                    <Link href="/about" className="evidence-link">
                       📖 Problem Analysis →
                     </Link>
-                    <Link href="/why-donorconnect" class="evidence-link">
+                    <Link href="/why-donorconnect" className="evidence-link">
                       🎯 Solution Documentation →
                     </Link>
-                    <Link href="/ai-policy" class="evidence-link">
+                    <Link href="/ai-policy" className="evidence-link">
                       🤖 AI Implementation Details →
                     </Link>
                   </div>
                 </div>
 
-                <div class="link-category">
+                <div className="link-category">
                   <h4>🎯 Core Features</h4>
-                  <div class="link-list">
-                    <Link href="/donors" class="evidence-link">
+                  <div className="link-list">
+                    <Link href="/donors" className="evidence-link">
                       👥 Donor Management →
                     </Link>
-                    <Link href="/donations" class="evidence-link">
+                    <Link href="/donations" className="evidence-link">
                       💝 Donation Tracking →
                     </Link>
-                    <Link href="/donors/new" class="evidence-link">
+                    <Link href="/donors/new" className="evidence-link">
                       ➕ Add New Donor Form →
                     </Link>
                   </div>
                 </div>
 
-                <div class="link-category">
+                <div className="link-category">
                   <h4>🏗️ Project Planning</h4>
-                  <div class="link-list">
-                    <a href="#" class="external-link disabled">
+                  <div className="link-list">
+                    <a href="#" className="external-link disabled">
                       📋 Trello Project Board → (Demo)
                     </a>
-                    <a href="#" class="external-link disabled">
+                    <a href="#" className="external-link disabled">
                       📐 Wireframes & Mockups → (Demo)
                     </a>
-                    <Link href="/reflection" class="evidence-link">
+                    <Link href="/reflection" className="evidence-link">
                       💭 Development Reflection →
                     </Link>
                   </div>
@@ -400,90 +402,90 @@ export default function Evidence() {
           </div>
         </section>
 
-        <section class="rubric-checklist">
-          <h2 class="evidence-section-title">✅ Complete Assessment Checklist</h2>
+        <section className="rubric-checklist">
+          <h2 className="evidence-section-title">✅ Complete Assessment Checklist</h2>
           
-          <div class="evidence-card">
+          <div className="evidence-card">
             <h3>📋 Requirements Fulfillment</h3>
-            <div class="evidence-content">
-              <div class="checklist">
-                <div class="requirement-group">
+            <div className="evidence-content">
+              <div className="checklist">
+                <div className="requirement-group">
                   <h4>🎯 Application Must Requirements</h4>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Build a working MVP with multiple pages (CCC.1.3 - CCC.1.5)</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Build a working MVP with multiple pages (CCC.1.3 - CCC.1.5)</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Integrate AI tools into workflow or product (TS.6.3)</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Integrate AI tools into workflow or product (TS.6.3)</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Use AI responsibly (TS.6.2)</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Use AI responsibly (TS.6.2)</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Allow nonprofit staff to view and manage donors</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Allow nonprofit staff to view and manage donors</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Allow nonprofit staff to record and view donations</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Allow nonprofit staff to record and view donations</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Include Role-Based Access (admin) OR admin-only features</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Include Role-Based Access (admin) OR admin-only features</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Include at least one AI integration</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Include at least one AI integration</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Be deployed live (Vercel) and publicly accessible</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Be deployed live (Vercel) and publicly accessible</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Use real data structures (not placeholder text only)</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Use real data structures (not placeholder text only)</span>
                   </div>
                 </div>
 
-                <div class="requirement-group">
+                <div className="requirement-group">
                   <h4>📄 Required Pages</h4>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Home - with app name, problem statement, solution statement</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Home - with app name, problem statement, solution statement</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">About/Problem - detailed problem analysis</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">About/Problem - detailed problem analysis</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Why DonorConnect - solution planning and reasoning</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Why DonorConnect - solution planning and reasoning</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Dashboard - working MVP with database data</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Dashboard - working MVP with database data</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Donors - list, form, confirmation, persistence</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Donors - list, form, confirmation, persistence</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Donations - list with required fields, connected to donors</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Donations - list with required fields, connected to donors</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">AI Policy & Safeguards - responsible AI documentation</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">AI Policy & Safeguards - responsible AI documentation</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Evidence/Rubric - this page with assessment support</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Evidence/Rubric - this page with assessment support</span>
                   </div>
-                  <div class="checklist-item completed">
-                    <span class="checkbox">✅</span>
-                    <span class="requirement">Reflection - learning and development insights</span>
+                  <div className="checklist-item completed">
+                    <span className="checkbox">✅</span>
+                    <span className="requirement">Reflection - learning and development insights</span>
                   </div>
                 </div>
               </div>
@@ -491,19 +493,19 @@ export default function Evidence() {
           </div>
         </section>
 
-        <section class="contact-assessor">
+        <section className="contact-assessor">
           <h2>📞 Questions or Need Clarification?</h2>
-          <div class="contact-info">
+          <div className="contact-info">
             <p>
               This evidence page is designed to support fair and comprehensive assessment. 
               If you need additional information, clarification on any implementation details, 
               or want to see specific functionality demonstrated, please don't hesitate to reach out.
             </p>
-            <div class="contact-actions">
-              <a href="mailto:student@example.com" class="btn btn-primary">
+            <div className="contact-actions">
+              <a href="mailto:student@example.com" className="btn btn-primary">
                 📧 Contact Developer
               </a>
-              <Link href="/reflection" class="btn btn-secondary">
+              <Link href="/reflection" className="btn btn-secondary">
                 💭 Read Development Reflection
               </Link>
             </div>

@@ -183,15 +183,32 @@ export default function Home() {
         @media (max-width: 768px) {
           .problem-solution {
             grid-template-columns: 1fr;
+            gap: 1.5rem;
           }
           
           .hero-content h2 {
-            font-size: 2rem;
+            font-size: 1.75rem;
           }
           
           .cta-button {
             display: block;
-            margin: 0.5rem 0;
+            margin: 0.75rem auto;
+            max-width: 300px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .hero-section {
+            padding: 2.5rem 1.5rem;
+          }
+
+          .hero-content h2 {
+            font-size: 1.5rem;
+          }
+
+          .cta-button {
+            padding: 0.875rem 1.5rem;
+            font-size: 0.95rem;
           }
         }
       `}</style>

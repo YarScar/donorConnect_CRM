@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 import SearchBar from '@/components/SearchBar'
@@ -15,10 +15,7 @@ export default function DonationsPage() {
   const [sortBy, setSortBy] = useState('date-desc')
 
   useEffect(() => {
-    fetchDonations()
-  }, [])
-
-  const fetchDonations = async () => {
+    const fetchDonations = async () => {
     try {
       const response = await fetch('/api/donations')
       const data = await response.json()
@@ -36,7 +33,16 @@ export default function DonationsPage() {
     } finally {
       setLoading(false)
     }
-  }
+    }
+    fetchDonations()
+  }, [])
+
+  // Apply filters and sorting when filterStatus or sortBy changes
+  useEffect(() => {
+    if (donations.length > 0) {
+      applyFiltersAndSorting(donations)
+    }
+  }, [filterStatus, sortBy, donations])
 
   const calculateDonorRiskLevel = (donor) => {
     if (!donor.donations || donor.donations.length === 0) return { level: 'New', color: '#6c757d' }
@@ -50,7 +56,7 @@ export default function DonationsPage() {
     return { level: 'Critical', color: '#dc3545' }
   }
 
-  const applyFiltersAndSorting = (donationData) => {
+  const applyFiltersAndSorting = useCallback((donationData) => {
     let filtered = [...donationData]
 
     // Apply status filter
@@ -80,7 +86,7 @@ export default function DonationsPage() {
     }
 
     setFilteredDonations(filtered)
-  }
+  }, [filterStatus, sortBy])
 
   const handleSearch = (searchTerm) => {
     const filtered = donations.filter(donation =>

@@ -185,7 +185,6 @@ export default function DonationForm({ donation = null, donors = [], campaigns =
             name="isRecurring"
             checked={formData.isRecurring}
             onChange={handleChange}
-            style={{ marginRight: '8px' }}
           />
           Recurring Donation
         </label>

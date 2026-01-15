@@ -11,10 +11,7 @@ export default function DonorDetailPage({ params }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchDonor()
-  }, [])
-
-  const fetchDonor = async () => {
+    const fetchDonor = async () => {
     try {
       const response = await fetch(`/api/donors/${params.id}`)
       const data = await response.json()
@@ -24,7 +21,9 @@ export default function DonorDetailPage({ params }) {
     } finally {
       setLoading(false)
     }
-  }
+    }
+    fetchDonor()
+  }, [params.id])
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString()

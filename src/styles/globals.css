@@ -262,11 +262,15 @@ body {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   position: relative;
   overflow: hidden;
   border: 2px solid transparent;
   box-shadow: var(--shadow);
+  white-space: nowrap;
 }
 
 .btn::before {
@@ -402,6 +406,7 @@ body {
   font-family: inherit;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: #ffffff;
+  line-height: 1.5;
 }
 
 .form-input:hover,
@@ -425,12 +430,32 @@ body {
   min-height: 100px;
 }
 
+/* Checkbox & Radio Styling */
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+}
+
+.form-group label:has(input[type="checkbox"]),
+.form-group label:has(input[type="radio"]) {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
 /* Tables */
 .table-container {
   background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
   border-radius: 16px;
   box-shadow: var(--shadow-lg);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: visible;
   border: 2px solid var(--border);
   transition: all 0.3s ease;
 }
@@ -774,6 +799,65 @@ html {
   color: var(--primary-dark);
 }
 
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: 10px;
+  border: 2px solid #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
+}
+
+/* Empty State Styling */
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+}
+
+.empty-state h3 {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.empty-state p {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.empty-state .btn,
+.empty-state .cta-button {
+  margin-top: 1rem;
+}
+
+/* Focus Visible for Accessibility */
+*:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .dashboard-grid {
@@ -799,6 +883,7 @@ html {
 
   .btn {
     width: 100%;
+    justify-content: center;
   }
 
   .nav-list {
@@ -814,6 +899,11 @@ html {
   .table td {
     padding: 12px 10px;
     font-size: 0.9rem;
+  }
+  
+  .table-container {
+    margin: 0 -10px;
+    border-radius: 8px;
   }
 
   .card {
@@ -834,5 +924,9 @@ html {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+  }
+  
+  .container {
+    padding: 15px;
   }
 }

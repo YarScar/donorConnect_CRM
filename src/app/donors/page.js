@@ -15,10 +15,7 @@ export default function DonorsPage() {
   const [loadingInsights, setLoadingInsights] = useState({})
 
   useEffect(() => {
-    fetchDonors()
-  }, [])
-
-  const fetchDonors = async () => {
+    const fetchDonors = async () => {
     try {
       console.log('Fetching donors from API...')
       const response = await fetch('/api/donors')
@@ -52,7 +49,9 @@ export default function DonorsPage() {
     } finally {
       setLoading(false)
     }
-  }
+    }
+    fetchDonors()
+  }, [])
 
   const calculateRiskLevel = (donor) => {
     if (!donor.lastDonation || donor.totalDonated === 0) return { level: 'New', color: '#6c757d' }
