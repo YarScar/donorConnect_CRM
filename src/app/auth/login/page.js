@@ -56,6 +56,24 @@ export default function LoginPage() {
           padding: 3rem;
           width: 100%;
           max-width: 440px;
+          position: relative;
+        }
+
+        .back-arrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #667eea;
+          text-decoration: none;
+          font-size: 0.9rem;
+          font-weight: 600;
+          margin-bottom: 1.5rem;
+          transition: all 0.2s ease;
+        }
+
+        .back-arrow:hover {
+          color: #764ba2;
+          transform: translateX(-3px);
         }
 
         .auth-header {
@@ -167,6 +185,9 @@ export default function LoginPage() {
 
       <div className="auth-container">
         <div className="auth-card">
+          <Link href="/" className="back-arrow">
+            ← Back to Home
+          </Link>
           <div className="auth-header">
             <h1 className="auth-title">🤝 DonorConnect</h1>
             <p className="auth-subtitle">Log in to your account</p>

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
 import LoadingSpinner from '@/components/LoadingSpinner'
 
 export default function Dashboard() {
@@ -53,7 +52,6 @@ export default function Dashboard() {
   if (error) {
     return (
       <div className="container">
-        <Navigation />
         <div className="error-state">
           <h2>Unable to load dashboard</h2>
           <p>{error}</p>
@@ -71,8 +69,6 @@ export default function Dashboard() {
         <h1>📊 Dashboard</h1>
         <p className="tagline">Your Nonprofit's Performance Overview</p>
       </header>
-
-      <Navigation />
 
       <main className="main">
         {/* Summary Cards */}
