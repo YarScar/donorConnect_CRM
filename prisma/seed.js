@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client')
+const bcrypt = require('bcryptjs')
 const prisma = new PrismaClient()
 
 async function main() {
@@ -12,6 +13,28 @@ async function main() {
   await prisma.event.deleteMany()
   await prisma.campaign.deleteMany()
   await prisma.donor.deleteMany()
+  await prisma.user.deleteMany()
+
+  // Create admin users
+  console.log('Creating admin users...')
+  
+  const adminUsers = [
+    { email: 'rob@launchpadphilly.org', password: 'lpuser1' },
+    { email: 'sanaa@launchpadphilly.org', password: 'lpuser2' },
+    { email: 'taheera@launchpadphilly.org', password: 'lpuser3' }
+  ]
+
+  for (const user of adminUsers) {
+    const hashedPassword = await bcrypt.hash(user.password, 12)
+    await prisma.user.create({
+      data: {
+        email: user.email,
+        password: hashedPassword,
+        role: 'ADMIN'
+      }
+    })
+    console.log(`Created admin user: ${user.email}`)
+  }
 
   // Create sample donors
   const donor1 = await prisma.donor.create({

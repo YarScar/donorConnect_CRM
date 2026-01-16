@@ -3,25 +3,44 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 
 const menuLinks = [
-  { href: '/donors', label: 'Donors', icon: '👥' },
-  { href: '/donations', label: 'Donations', icon: '💝' },
-  { href: '/campaigns', label: 'Campaigns', icon: '📢' },
-  { href: '/events', label: 'Events', icon: '🎉' },
-  { href: '/follow-ups', label: 'Follow-ups', icon: '📋' },
-  { href: '/evidence', label: 'Evidence', icon: '📁' },
-  { href: '/reflection', label: 'Reflection', icon: '💭' },
+  { href: '/dashboard', label: 'Dashboard', icon: '📊', adminOnly: false },
+  { href: '/donors', label: 'Donors', icon: '👥', adminOnly: false },
+  { href: '/donations', label: 'Donations', icon: '💝', adminOnly: false },
+  { href: '/campaigns', label: 'Campaigns', icon: '📢', adminOnly: false },
+  { href: '/events', label: 'Events', icon: '🎉', adminOnly: false },
+  { href: '/follow-ups', label: 'Follow-ups', icon: '📋', adminOnly: false },
+  { href: '/evidence', label: 'Evidence', icon: '📁', adminOnly: true },
+  { href: '/reflection', label: 'Reflection', icon: '💭', adminOnly: true },
 ]
 
 export default function Navigation() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
+  const { data: session, status } = useSession()
 
   const isActive = (path) => pathname === path || pathname.startsWith(path + '/')
 
   const toggleMenu = () => setIsOpen(!isOpen)
   const closeMenu = () => setIsOpen(false)
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/auth/login' })
+  }
+
+  // Filter menu links based on user role
+  const filteredMenuLinks = session?.user?.role === 'ADMIN'
+    ? menuLinks
+    : menuLinks.filter(link => !link.adminOnly)
+
+  const isAuthPage = pathname.startsWith('/auth')
+
+  // Don't show navigation on auth pages
+  if (isAuthPage) {
+    return null
+  }
 
   return (
     <>
@@ -43,12 +62,6 @@ export default function Navigation() {
           align-items: center;
           height: 70px;
           position: relative;
-        }
-
-        .hamburger-left-section {
-          display: flex;
-          align-items: center;
-          gap: 2rem;
         }
 
         .hamburger-nav-brand {
@@ -74,33 +87,46 @@ export default function Navigation() {
           font-size: 1.8rem;
         }
 
-        .dashboard-link {
+        .hamburger-right-section {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .auth-btn {
+          padding: 0.5rem 1.25rem;
+          background: rgba(255, 255, 255, 0.2);
+          color: white;
+          border: 2px solid rgba(255, 255, 255, 0.5);
+          border-radius: 8px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          cursor: pointer;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          white-space: nowrap;
+        }
+
+        .auth-btn:hover {
+          background: rgba(255, 255, 255, 0.3);
+          border-color: white;
+          transform: translateY(-2px);
+        }
+
+        .user-info {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          padding: 0.5rem 1.25rem;
           color: white;
-          text-decoration: none;
-          font-size: 1rem;
-          font-weight: 500;
-          border-radius: 8px;
-          transition: all 0.3s ease;
-          border-bottom: 3px solid transparent;
+          font-size: 0.85rem;
         }
 
-        .dashboard-link:hover {
-          background: rgba(255, 255, 255, 0.2);
-          border-bottom-color: white;
-        }
-
-        .dashboard-link.active {
+        .user-role {
+          padding: 0.25rem 0.625rem;
           background: rgba(255, 255, 255, 0.25);
-          border-bottom-color: #fbbf24;
+          border-radius: 6px;
           font-weight: 600;
-        }
-
-        .dashboard-icon {
-          font-size: 1.2rem;
+          font-size: 0.75rem;
         }
 
         .hamburger-dropdown {
@@ -247,74 +273,81 @@ export default function Navigation() {
           .hamburger-brand-icon {
             font-size: 1.5rem;
           }
-          .dashboard-link {
-            font-size: 0.9rem;
-            padding: 0.4rem 1rem;
+          .auth-btn, .user-info {
+            font-size: 0.8rem;
           }
-          .dashboard-icon {
-            font-size: 1rem;
+          .user-role {
+            display: none;
           }
         }
 
         @media (max-width: 480px) {
-          .hamburger-left-section {
-            gap: 1rem;
-          }
           .hamburger-menu {
             width: 260px;
+          }
+          .auth-btn {
+            padding: 0.4rem 0.875rem;
           }
         }
       `}</style>
 
       <nav className="hamburger-nav">
         <div className="hamburger-nav-container">
-          <div className="hamburger-left-section">
-            <div className="hamburger-nav-brand">
-              <Link href="/" className="hamburger-brand-link">
-                <span className="hamburger-brand-icon">🤝</span>
-                <span>DonorConnect</span>
-              </Link>
-            </div>
-
-            <Link 
-              href="/dashboard" 
-              className={`dashboard-link ${isActive('/dashboard') ? 'active' : ''}`}
-            >
-              <span className="dashboard-icon">📊</span>
-              <span>Dashboard</span>
+          <div className="hamburger-nav-brand">
+            <Link href="/" className="hamburger-brand-link">
+              <span className="hamburger-brand-icon">🤝</span>
+              <span>DonorConnect</span>
             </Link>
           </div>
 
-          <div className="hamburger-dropdown">
-            <button 
-              className={`hamburger-btn ${isOpen ? 'open' : ''}`}
-              onClick={toggleMenu}
-              aria-label="Toggle menu"
-              aria-expanded={isOpen}
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
+          <div className="hamburger-right-section">
+            {status === 'loading' ? null : status === 'authenticated' ? (
+              <>
+                <div className="user-info">
+                  <span>{session.user.email}</span>
+                  <span className="user-role">{session.user.role}</span>
+                </div>
+                <button onClick={handleLogout} className="auth-btn">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link href="/auth/login" className="auth-btn">
+                Log in / Sign up
+              </Link>
+            )}
 
-            <div className={`hamburger-menu ${isOpen ? 'open' : ''}`}>
-              <ul className="hamburger-list">
-                {menuLinks.map((link) => (
-                  <li key={link.href}>
-                    <Link 
-                      href={link.href}
-                      className={`hamburger-nav-link ${isActive(link.href) ? 'active' : ''}`}
-                      onClick={closeMenu}
-                    >
-                      <span className="hamburger-nav-icon">{link.icon}</span>
-                      <span>{link.label}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+            <div className="hamburger-dropdown">
+              <button 
+                className={`hamburger-btn ${isOpen ? 'open' : ''}`}
+                onClick={toggleMenu}
+                aria-label="Toggle menu"
+                aria-expanded={isOpen}
+              >
+                <span></span>
+                <span></span>
+                <span></span>
+              </button>
+
+              <div className={`hamburger-menu ${isOpen ? 'open' : ''}`}>
+                <ul className="hamburger-list">
+                  {filteredMenuLinks.map((link) => (
+                    <li key={link.href}>
+                      <Link 
+                        href={link.href}
+                        className={`hamburger-nav-link ${isActive(link.href) ? 'active' : ''}`}
+                        onClick={closeMenu}
+                      >
+                        <span className="hamburger-nav-icon">{link.icon}</span>
+                        <span>{link.label}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {isOpen && <div className="hamburger-overlay" onClick={closeMenu}></div>}
             </div>
-
-            {isOpen && <div className="hamburger-overlay" onClick={closeMenu}></div>}
           </div>
         </div>
       </nav>

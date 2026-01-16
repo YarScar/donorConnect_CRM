@@ -1,17 +1,15 @@
-'use client'
-
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
+import { checkAdminAuth } from '@/lib/authHelpers'
 
-export default function Reflection() {
+export default async function Reflection() {
+  await checkAdminAuth()
+
   return (
     <div className="container">
       <header className="header">
         <h1>💭 Development Reflection</h1>
         <p className="tagline">Learning, Growth, and Decision-Making in Building DonorConnect</p>
       </header>
-
-      <Navigation />
 
       <main className="main">
         <section className="dashboard-grid">

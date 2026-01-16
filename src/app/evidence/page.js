@@ -1,17 +1,15 @@
-'use client'
-
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
+import { checkAdminAuth } from '@/lib/authHelpers'
 
-export default function Evidence() {
+export default async function Evidence() {
+  await checkAdminAuth()
+
   return (
     <div className="container">
       <header className="header">
         <h1>📋 Assessment Evidence & Rubric</h1>
         <p className="tagline">Supporting Documentation for Fair Assessment</p>
       </header>
-
-      <Navigation />
 
       <main className="main">
         <section className="evidence-intro">
