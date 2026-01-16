@@ -11,8 +11,6 @@ export default function WhyDonorConnect() {
         <p className="tagline">Our Solution, Planning & System Architecture</p>
       </header>
 
-      <Navigation />
-
       <main className="main">
         <section className="solution-section">
           <h2>Our Solution: Intelligent Donor Relationship Management</h2>

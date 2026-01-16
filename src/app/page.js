@@ -11,7 +11,6 @@ export default function Home() {
         <p className="tagline">Intelligent CRM for Nonprofits</p>
       </header>
 
-      <Navigation />
 
       <main className="main">
         <section className="hero-section">

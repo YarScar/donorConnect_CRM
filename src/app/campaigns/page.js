@@ -37,8 +37,6 @@ export default function CampaignsPage() {
 
   return (
     <div className="container">
-      <Navigation />
-      
       <div className="card-header">
         <h1 className="card-title">Campaigns</h1>
         <Link href="/campaigns/new" className="btn btn-primary">Add Campaign</Link>

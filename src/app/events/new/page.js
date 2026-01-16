@@ -58,7 +58,6 @@ export default function NewEventPage() {
 
   return (
     <div className="container">
-      <Navigation />
       <h1>Add New Event</h1>
 
       <form className="form" onSubmit={handleSubmit}>

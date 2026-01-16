@@ -131,8 +131,6 @@ export default function DonorsPage() {
 
   return (
     <div className="container">
-      <Navigation />
-      
       <div className="donors-header">
         <div className="header-content">
           <h1>👥 Donor Management</h1>

@@ -73,7 +73,6 @@ export default function NewFollowUpPage() {
 
   return (
     <div className="container">
-      <Navigation />
       <h1>Add New Follow-up</h1>
 
       <form className="form" onSubmit={handleSubmit}>

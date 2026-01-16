@@ -54,7 +54,6 @@ export default function NewCampaignPage() {
 
   return (
     <div className="container">
-      <Navigation />
       <h1>Add New Campaign</h1>
 
       <form className="form" onSubmit={handleSubmit}>

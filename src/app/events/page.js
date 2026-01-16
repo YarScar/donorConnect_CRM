@@ -37,8 +37,6 @@ export default function EventsPage() {
 
   return (
     <div className="container">
-      <Navigation />
-      
       <div className="card-header">
         <h1 className="card-title">Events</h1>
         <Link href="/events/new" className="btn btn-primary">Add Event</Link>

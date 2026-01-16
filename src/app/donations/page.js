@@ -164,8 +164,6 @@ export default function DonationsPage() {
 
   return (
     <div className="container">
-      <Navigation />
-      
       <div className="donations-header">
         <div className="header-content">
           <h1>💝 Donation Management</h1>

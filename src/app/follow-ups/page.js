@@ -60,7 +60,6 @@ export default function FollowUpsPage() {
 
   return (
     <div className="container">
-      <Navigation />
       
       <div className="card-header">
         <h1 className="card-title">Follow-ups</h1>

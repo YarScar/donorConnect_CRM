@@ -36,7 +36,6 @@ export default function DonorDetailPage({ params }) {
 
   return (
     <div className="container">
-      <Navigation />
       
       <div className="card">
         <div className="card-header">

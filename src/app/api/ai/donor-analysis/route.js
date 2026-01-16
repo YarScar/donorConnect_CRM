@@ -63,6 +63,11 @@ export async function POST(request) {
         prompt = `Based on this donor profile, suggest a personalized engagement strategy:
         
 Donor: ${donor.firstName} ${donor.lastName}
+Email: ${donor.email || 'Not provided'}
+Phone: ${donor.phone || 'Not provided'}
+Location: ${donor.city ? `${donor.city}, ${donor.state}` : 'Not provided'}
+Donor Type: ${donor.donorType}
+Preferred Contact: ${donor.preferredContact}
 Total Donations: ${donorSummary.totalDonations}
 Total Amount: $${donorSummary.totalAmount}
 Average Gift: $${donorSummary.averageGift.toFixed(2)}
@@ -71,9 +76,10 @@ Donation Frequency: ${donorSummary.donationFrequency}
 Campaign Participation: ${donorSummary.campaignParticipation} campaigns
 Event Participation: ${donorSummary.eventParticipation} events
 Follow-up History: ${donorSummary.followUpHistory} interactions
+Notes: ${donor.notes || 'None'}
 
 Provide a concise, actionable engagement strategy focusing on:
-1. Recommended next steps
+1. Recommended next steps (considering their preferred contact method)
 2. Optimal communication timing
 3. Suggested donation ask amount
 4. Relationship building opportunities`
@@ -83,11 +89,17 @@ Provide a concise, actionable engagement strategy focusing on:
         prompt = `Analyze the lapse risk for this donor and provide specific recommendations:
         
 Donor Profile:
-- Total Donations: ${donorSummary.totalDonations}
-- Total Given: $${donorSummary.totalAmount}
-- Days Since Last Gift: ${donorSummary.daysSinceLastDonation || 'No donations'}
-- Frequency Pattern: ${donorSummary.donationFrequency}
-- Engagement Level: ${donorSummary.followUpHistory} follow-ups
+Name: ${donor.firstName} ${donor.lastName}
+Donor Type: ${donor.donorType}
+Location: ${donor.city ? `${donor.city}, ${donor.state}` : 'Not provided'}
+Total Donations: ${donorSummary.totalDonations}
+Total Given: $${donorSummary.totalAmount}
+Days Since Last Gift: ${donorSummary.daysSinceLastDonation || 'No donations'}
+Frequency Pattern: ${donorSummary.donationFrequency}
+Engagement Level: ${donorSummary.followUpHistory} follow-ups
+Campaign Participation: ${donorSummary.campaignParticipation} campaigns
+Event Participation: ${donorSummary.eventParticipation} events
+Notes: ${donor.notes || 'None'}
 
 Assess the risk level (Low/Medium/High) and provide:
 1. Risk factors identified
@@ -99,10 +111,15 @@ Assess the risk level (Low/Medium/High) and provide:
         prompt = `Evaluate this donor's potential for gift upgrades:
         
 Current Profile:
-- Donation History: ${donorSummary.totalDonations} gifts totaling $${donorSummary.totalAmount}
-- Average Gift: $${donorSummary.averageGift.toFixed(2)}
-- Giving Pattern: ${donorSummary.donationFrequency}
-- Campaign Engagement: ${donorSummary.campaignParticipation > 0 ? 'Active' : 'Limited'}
+Name: ${donor.firstName} ${donor.lastName}
+Donor Type: ${donor.donorType}
+Location: ${donor.city ? `${donor.city}, ${donor.state}` : 'Not provided'}
+Donation History: ${donorSummary.totalDonations} gifts totaling $${donorSummary.totalAmount}
+Average Gift: $${donorSummary.averageGift.toFixed(2)}
+Giving Pattern: ${donorSummary.donationFrequency}
+Campaign Engagement: ${donorSummary.campaignParticipation > 0 ? 'Active' : 'Limited'}
+Event Participation: ${donorSummary.eventParticipation} events
+Notes: ${donor.notes || 'None'}
 
 Provide upgrade assessment including:
 1. Upgrade likelihood (Low/Medium/High)

@@ -28,7 +28,6 @@ export default function EditDonorPage({ params }) {
 
   return (
     <div className="container">
-      <Navigation />
       <h1>Edit Donor</h1>
       {donor && <DonorForm donor={donor} />}
     </div>

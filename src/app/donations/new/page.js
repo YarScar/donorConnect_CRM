@@ -37,7 +37,6 @@ export default function NewDonationPage() {
 
   return (
     <div className="container">
-      <Navigation />
       <h1>Add New Donation</h1>
       <DonationForm donors={donors} campaigns={campaigns} events={events} />
     </div>
