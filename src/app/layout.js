@@ -1,6 +1,4 @@
 import '@/styles/globals.css'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import SessionProvider from '@/components/SessionProvider'
 import Navigation from '@/components/Navigation'
 
@@ -9,13 +7,11 @@ export const metadata = {
   description: 'Lightweight CRM for managing donors, donations, campaigns, and events',
 }
 
-export default async function RootLayout({ children }) {
-  const session = await getServerSession(authOptions)
-
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <SessionProvider session={session}>
+        <SessionProvider>
           <Navigation />
           {children}
         </SessionProvider>

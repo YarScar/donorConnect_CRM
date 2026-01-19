@@ -1,11 +1,7 @@
 'use client'
+import { useState, useEffect } from 'react'
 
-import { SessionProvider as NextAuthSessionProvider } from 'next-auth/react'
-
-export default function SessionProvider({ children, session }) {
-  return (
-    <NextAuthSessionProvider session={session}>
-      {children}
-    </NextAuthSessionProvider>
-  )
+export default function SessionProvider({ children }) {
+  // Minimal session provider placeholder. Client components can call /api/auth/me directly.
+  return children
 }

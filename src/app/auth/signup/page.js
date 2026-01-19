@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signIn } from 'next-auth/react'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -45,14 +44,14 @@ export default function SignupPage() {
         return
       }
 
-      // Auto-login after successful signup
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      // Auto-login after successful signup using custom login endpoint
+      const loginRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       })
 
-      if (result?.ok) {
+      if (loginRes.ok) {
         router.push('/dashboard')
         router.refresh()
       } else {

@@ -1,9 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useState } from 'react'
-import { useSession, signOut } from 'next-auth/react'
+import { usePathname, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 const menuLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊', adminOnly: false },
@@ -19,7 +18,31 @@ const menuLinks = [
 export default function Navigation() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
-  const { data: session, status } = useSession()
+  const [session, setSession] = useState(null)
+  const [status, setStatus] = useState('loading')
+  const router = useRouter()
+
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const res = await fetch('/api/auth/me')
+        if (!mounted) return
+        if (!res.ok) {
+          setSession(null)
+          setStatus('unauthenticated')
+          return
+        }
+        const data = await res.json()
+        setSession(data.user)
+        setStatus('authenticated')
+      } catch (e) {
+        setSession(null)
+        setStatus('unauthenticated')
+      }
+    })()
+    return () => { mounted = false }
+  }, [])
 
   const isActive = (path) => pathname === path || pathname.startsWith(path + '/')
 
@@ -27,7 +50,8 @@ export default function Navigation() {
   const closeMenu = () => setIsOpen(false)
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: '/auth/login' })
+    await fetch('/api/auth/logout', { method: 'POST' })
+    router.push('/auth/login')
   }
 
   // Filter menu links based on user role
