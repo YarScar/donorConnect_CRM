@@ -34,8 +34,13 @@ export default function Navigation() {
           return
         }
         const data = await res.json()
-        setSession({ user: data.user })
-        setStatus('authenticated')
+        if (data && data.user) {
+          setSession({ user: data.user })
+          setStatus('authenticated')
+        } else {
+          setSession(null)
+          setStatus('unauthenticated')
+        }
       } catch (e) {
         setSession(null)
         setStatus('unauthenticated')
@@ -328,8 +333,8 @@ export default function Navigation() {
             {status === 'loading' ? null : status === 'authenticated' ? (
               <>
                 <div className="user-info">
-                  <span>{session.user.email}</span>
-                  <span className="user-role">{session.user.role}</span>
+                  <span>{session?.user?.email ?? 'Unknown'}</span>
+                  <span className="user-role">{session?.user?.role ?? ''}</span>
                 </div>
                 <button onClick={handleLogout} className="auth-btn">
                   Logout
