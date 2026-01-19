@@ -34,7 +34,7 @@ export default function Navigation() {
           return
         }
         const data = await res.json()
-        setSession(data.user)
+        setSession({ user: data.user })
         setStatus('authenticated')
       } catch (e) {
         setSession(null)
