@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 import SearchBar from '@/components/SearchBar'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import ReactMarkdown from 'react-markdown'
 
 export default function DonorsPage() {
   const [donors, setDonors] = useState([])
@@ -13,6 +14,7 @@ export default function DonorsPage() {
   const [isAdmin, setIsAdmin] = useState(true) // For demo purposes, set to true
   const [aiInsights, setAiInsights] = useState({})
   const [loadingInsights, setLoadingInsights] = useState({})
+  const [selectedInsight, setSelectedInsight] = useState(null)
 
   useEffect(() => {
     const fetchDonors = async () => {
@@ -104,13 +106,41 @@ export default function DonorsPage() {
       })
       
       const data = await response.json()
-      setAiInsights(prev => ({ ...prev, [donorId]: data.analysis }))
+      
+      // Check for API errors
+      if (!response.ok || data.error) {
+        const donor = donors.find(d => d.id === donorId)
+        const errorMessage = data.details || data.error || 'Failed to generate AI insights'
+        
+        setSelectedInsight({ 
+          donorName: `${donor.firstName} ${donor.lastName}`,
+          content: `⚠️ Error: ${errorMessage}\n\n${data.suggestion || 'Please try again later.'}`,
+          source: 'Error',
+          isError: true
+        })
+        return
+      }
+      
+      const donor = donors.find(d => d.id === donorId)
+      const content = data.analysis || 'No insights available'
+      const source = data.source || 'AI Analysis'
+      
+      setAiInsights(prev => ({ ...prev, [donorId]: content }))
+      setSelectedInsight({ 
+        donorName: `${donor.firstName} ${donor.lastName}`,
+        content: content,
+        source: source,
+        isError: false
+      })
     } catch (error) {
       console.error('Error generating AI insight:', error)
-      setAiInsights(prev => ({ 
-        ...prev, 
-        [donorId]: 'Unable to generate insights at this time. Please try again later.' 
-      }))
+      const donor = donors.find(d => d.id === donorId)
+      setSelectedInsight({ 
+        donorName: `${donor.firstName} ${donor.lastName}`,
+        content: `⚠️ Network Error: Unable to connect to AI service.\n\nPlease check your internet connection and try again.`,
+        source: 'Error',
+        isError: true
+      })
     } finally {
       setLoadingInsights(prev => ({ ...prev, [donorId]: false }))
     }
@@ -232,19 +262,6 @@ export default function DonorsPage() {
                       </button>
                     )}
                   </div>
-                  {aiInsights[donor.id] && (
-                    <div className="ai-insight-preview">
-                      <div className="insight-content">
-                        {aiInsights[donor.id].substring(0, 150)}...
-                      </div>
-                      <button 
-                        onClick={() => setAiInsights(prev => ({ ...prev, [donor.id]: null }))}
-                        className="close-insight"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  )}
                 </td>
               </tr>
             ))}
@@ -262,6 +279,29 @@ export default function DonorsPage() {
           </div>
         )}
       </div>
+
+      {/* AI Insight Modal */}
+      {selectedInsight && (
+        <div className="modal-overlay" onClick={() => setSelectedInsight(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>🤖 AI Insights for {selectedInsight.donorName}</h2>
+              <button className="modal-close" onClick={() => setSelectedInsight(null)}>✕</button>
+            </div>
+            <div className="modal-source" style={{ 
+              background: selectedInsight.isError ? '#fff3cd' : '#f8f9fa',
+              color: selectedInsight.isError ? '#856404' : '#6c757d'
+            }}>
+              <small>Source: {selectedInsight.source}</small>
+            </div>
+            <div className="modal-body">
+              <div className="insight-text">
+                <ReactMarkdown>{selectedInsight.content}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         .donors-header {
@@ -444,31 +484,175 @@ export default function DonorsPage() {
           margin-right: 0.5rem;
         }
 
-        .ai-insight-preview {
-          background: #f8f9ff;
-          border: 1px solid #6f42c1;
-          border-radius: 8px;
-          padding: 1rem;
-          margin-top: 1rem;
-          position: relative;
-          max-width: 400px;
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+          padding: 2rem;
         }
 
-        .insight-content {
-          font-size: 0.9rem;
-          line-height: 1.4;
+        .modal-content {
+          background: white;
+          border-radius: 12px;
+          width: 100%;
+          max-width: 700px;
+          max-height: 80vh;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1.5rem 2rem;
+          border-bottom: 2px solid #e9ecef;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h2 {
+          margin: 0;
+          font-size: 1.5rem;
+        }
+
+        .modal-source {
+          padding: 0.75rem 2rem;
+          background: #f8f9fa;
+          border-bottom: 1px solid #e9ecef;
+          color: #6c757d;
+          font-style: italic;
+        }
+
+        .modal-close {
+          background: rgba(255, 255, 255, 0.2);
+          border: none;
+          color: white;
+          font-size: 1.5rem;
+          cursor: pointer;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+          background: rgba(255, 255, 255, 0.3);
+          transform: scale(1.1);
+        }
+
+        .modal-body {
+          padding: 2rem;
+          overflow-y: auto;
+          flex: 1;
+        }
+
+        .insight-text {
+          line-height: 1.8;
+          color: #2d3748;
+          font-size: 1rem;
+        }
+
+        /* Markdown Styling */
+        .insight-text h1 {
+          font-size: 1.8rem;
+          color: #1a202c;
+          margin-top: 1.5rem;
+          margin-bottom: 1rem;
+          border-bottom: 2px solid #e2e8f0;
+          padding-bottom: 0.5rem;
+        }
+
+        .insight-text h2 {
+          font-size: 1.5rem;
+          color: #2d3748;
+          margin-top: 1.5rem;
+          margin-bottom: 0.8rem;
+          font-weight: 600;
+        }
+
+        .insight-text h3 {
+          font-size: 1.25rem;
+          color: #4a5568;
+          margin-top: 1rem;
+          margin-bottom: 0.6rem;
+        }
+
+        .insight-text p {
+          margin-bottom: 1rem;
+          line-height: 1.7;
+        }
+
+        .insight-text ul, .insight-text ol {
+          margin-bottom: 1rem;
+          margin-left: 1.5rem;
+          line-height: 1.8;
+        }
+
+        .insight-text li {
+          margin-bottom: 0.5rem;
+        }
+
+        .insight-text strong {
+          color: #1a202c;
+          font-weight: 600;
+        }
+
+        .insight-text em {
+          font-style: italic;
           color: #4a5568;
         }
 
-        .close-insight {
-          position: absolute;
-          top: 0.5rem;
-          right: 0.5rem;
-          background: none;
+        .insight-text code {
+          background: #f7fafc;
+          padding: 0.2rem 0.4rem;
+          border-radius: 3px;
+          font-family: 'Courier New', monospace;
+          font-size: 0.9em;
+          color: #e53e3e;
+        }
+
+        .insight-text pre {
+          background: #f7fafc;
+          padding: 1rem;
+          border-radius: 6px;
+          overflow-x: auto;
+          margin-bottom: 1rem;
+        }
+
+        .insight-text blockquote {
+          border-left: 4px solid #667eea;
+          padding-left: 1rem;
+          margin: 1rem 0;
+          color: #4a5568;
+          font-style: italic;
+        }
+
+        .insight-text hr {
           border: none;
-          color: #6f42c1;
-          cursor: pointer;
-          font-size: 1.2rem;
+          border-top: 1px solid #e2e8f0;
+          margin: 1.5rem 0;
+        }
+
+        .insight-text a {
+          color: #667eea;
+          text-decoration: underline;
+        }
+
+        .insight-text a:hover {
+          color: #764ba2;
         }
 
         .empty-state {

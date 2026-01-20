@@ -77,7 +77,13 @@ Event Participation: ${donorSummary.eventParticipation} events
 Follow-up History: ${donorSummary.followUpHistory} interactions
 Notes: ${donor.notes || 'None'}
 
-Provide a concise, actionable engagement strategy focusing on:
+Provide a concise, actionable engagement strategy. Format your response in markdown with:
+- Use ## headers for main sections
+- Use **bold** for key points
+- Use numbered lists (1., 2., 3.) for sequential steps
+- Use bullet points for lists of items
+
+Focus on:
 1. Recommended next steps (considering their preferred contact method)
 2. Optimal communication timing
 3. Suggested donation ask amount
@@ -100,7 +106,13 @@ Campaign Participation: ${donorSummary.campaignParticipation} campaigns
 Event Participation: ${donorSummary.eventParticipation} events
 Notes: ${donor.notes || 'None'}
 
-Assess the risk level (Low/Medium/High) and provide:
+Assess the risk level (Low/Medium/High) and provide your analysis in markdown format:
+- Use ## for section headers
+- Use **bold** for the risk level and key terms
+- Use bullet points for lists
+- Use numbered lists for action items
+
+Provide:
 1. Risk factors identified
 2. Recommended intervention timeline
 3. Specific retention strategies`
@@ -120,7 +132,12 @@ Campaign Engagement: ${donorSummary.campaignParticipation > 0 ? 'Active' : 'Limi
 Event Participation: ${donorSummary.eventParticipation} events
 Notes: ${donor.notes || 'None'}
 
-Provide upgrade assessment including:
+Provide upgrade assessment in well-formatted markdown:
+- Use ## headers for main sections
+- Use **bold** for key metrics and recommendations
+- Use bullet points and numbered lists
+
+Include:
 1. Upgrade likelihood (Low/Medium/High)
 2. Suggested ask amount
 3. Best approach strategy
@@ -131,23 +148,51 @@ Provide upgrade assessment including:
         analysis = generateBasicAnalysis(donor, donorSummary)
     }
 
-    // For demo purposes, if no OpenAI key is available, return mock analysis
+    // Validate OpenAI configuration - REQUIRE real AI, no mock fallback
     const OPENAI_KEY = process.env.OPENAI_API_KEY
-    const OPENAI_MODEL = process.env.OPENAI_MODEL
+    
+    // Try multiple models in order of preference
+    const MODELS_TO_TRY = ['gpt-4o-mini', 'gpt-3.5-turbo', 'gpt-4o', 'gpt-4-turbo']
+    
+    // Log configuration status (without exposing full key)
+    logger.info('OpenAI Configuration Check', {
+      hasKey: !!OPENAI_KEY,
+      keyPrefix: OPENAI_KEY ? OPENAI_KEY.substring(0, 10) + '...' : 'none',
+      modelsToTry: MODELS_TO_TRY,
+      clientInitialized: !!openai
+    })
+    
+    if (!OPENAI_KEY) {
+      logger.error('OpenAI not configured', { hasKey: false })
+      return NextResponse.json({
+        error: 'AI service not configured',
+        details: 'OpenAI API key not set',
+        suggestion: 'Please check your .env file and restart the server'
+      }, { status: 503 })
+    }
 
-    if (!OPENAI_KEY || !OPENAI_MODEL || !openai) {
-      if (!OPENAI_MODEL && OPENAI_KEY) {
-        logger.warn('OPENAI_MODEL not set, using mock analysis')
-      }
-      analysis = generateMockAnalysis(type, donor, donorSummary)
-    } else {
+    if (!openai) {
+      logger.error('OpenAI client not initialized despite having credentials')
+      return NextResponse.json({
+        error: 'AI service initialization failed',
+        details: 'OpenAI client could not be created with the provided credentials'
+      }, { status: 503 })
+    }
+
+    // Call OpenAI API - try models until one works
+    let usedModel = ''
+    let lastError = null
+
+    for (const model of MODELS_TO_TRY) {
       try {
+        logger.info('Attempting OpenAI API call', { model, donorId })
+        
         const completion = await openai.chat.completions.create({
-          model: OPENAI_MODEL,
+          model: model,
           messages: [
             {
               role: "system",
-              content: "You are an expert nonprofit fundraising consultant. Provide practical, actionable advice based on donor data. Be specific and considerate of nonprofit best practices."
+              content: "You are an expert nonprofit fundraising consultant. Provide practical, actionable advice based on donor data. Be specific and considerate of nonprofit best practices. Format your response using markdown with headers (##), bullet points, bold text, and numbered lists for better readability."
             },
             {
               role: "user",
@@ -159,11 +204,53 @@ Provide upgrade assessment including:
         })
 
         analysis = completion.choices[0].message.content
-      } catch (aiError) {
-        logger.error('OpenAI API Error', { error: aiError.message, donorId })
-        // If model not available or permission denied, fall back to mock
-        analysis = generateMockAnalysis(type, donor, donorSummary)
+        usedModel = model
+        logger.info('OpenAI API call successful', { donorId, model, responseLength: analysis.length })
+        break // Success! Exit the loop
+        
+      } catch (modelError) {
+        lastError = modelError
+        logger.warn('Model not available, trying next', { 
+          model, 
+          error: modelError.message,
+          status: modelError.status 
+        })
+        
+        // If it's not a model access issue, stop trying
+        if (modelError.status !== 403 && modelError.status !== 404) {
+          break
+        }
       }
+    }
+
+    // If no model worked, return error
+    if (!analysis) {
+      logger.error('All OpenAI models failed', { 
+        error: lastError?.message, 
+        status: lastError?.status,
+        donorId 
+      })
+      
+      let userMessage = lastError?.message || 'Unable to generate AI insights'
+      let suggestion = 'Please check your OpenAI API key and try again'
+      
+      if (lastError?.status === 401) {
+        userMessage = 'Invalid OpenAI API key'
+        suggestion = 'Your API key appears to be invalid or expired. Please update it in the .env file'
+      } else if (lastError?.status === 429) {
+        userMessage = 'Rate limit exceeded'
+        suggestion = 'Too many requests. Please wait a moment and try again'
+      } else if (lastError?.status === 403 || lastError?.status === 404) {
+        userMessage = 'No accessible AI models found'
+        suggestion = 'Your OpenAI account does not have access to any models. Please check your OpenAI account settings or upgrade your plan.'
+      }
+      
+      return NextResponse.json({
+        error: 'AI analysis failed',
+        details: userMessage,
+        suggestion: suggestion,
+        errorCode: lastError?.code || lastError?.status
+      }, { status: 500 })
     }
 
     return NextResponse.json({
@@ -175,6 +262,9 @@ Provide upgrade assessment including:
       analysisType: type,
       summary: donorSummary,
       analysis: analysis,
+      isRealAI: true,
+      source: `OpenAI ${usedModel}`,
+      model: usedModel,
       generatedAt: new Date().toISOString()
     })
 
