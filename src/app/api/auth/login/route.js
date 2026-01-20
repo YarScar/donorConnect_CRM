@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 
-const prisma = new PrismaClient()
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me'
+const JWT_SECRET = process.env.JWT_SECRET
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not set')
+}
 
 export async function POST(request) {
   try {
@@ -20,8 +23,18 @@ export async function POST(request) {
     const token = jwt.sign({ sub: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' })
 
     const res = NextResponse.json({ ok: true })
-    // Set HttpOnly cookie
-    res.headers.set('Set-Cookie', `token=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`)
+    // Set HttpOnly cookie with secure settings
+    const isProduction = process.env.NODE_ENV === 'production'
+    const cookieOptions = [
+      `token=${token}`,
+      'Path=/',
+      'HttpOnly',
+      'SameSite=Lax',
+      `Max-Age=${7 * 24 * 60 * 60}`,
+      isProduction && 'Secure'
+    ].filter(Boolean).join('; ')
+    
+    res.headers.set('Set-Cookie', cookieOptions)
     return res
   } catch (err) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 })

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 export function middleware(request) {
   const { pathname } = request.nextUrl
+  
   // Only protect certain app routes; allow assets/public
   const protectedPaths = [
     '/dashboard',
@@ -15,7 +16,31 @@ export function middleware(request) {
   ]
 
   const matches = protectedPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))
-  if (!matches) return NextResponse.next()
+  
+  // Create response with security headers
+  const response = matches ? null : NextResponse.next()
+  
+  if (!matches) {
+    // Add security headers for all requests
+    const headers = response.headers
+    
+    // Prevent clickjacking
+    headers.set('X-Frame-Options', 'DENY')
+    
+    // Prevent MIME type sniffing
+    headers.set('X-Content-Type-Options', 'nosniff')
+    
+    // Enable XSS protection
+    headers.set('X-XSS-Protection', '1; mode=block')
+    
+    // Referrer policy
+    headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+    
+    // Permissions policy
+    headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+    
+    return response
+  }
 
   // Simple presence check for token cookie; detailed role checks happen in server pages
   const token = request.cookies.get('token')?.value
@@ -25,7 +50,17 @@ export function middleware(request) {
     return NextResponse.redirect(url)
   }
 
-  return NextResponse.next()
+  // Add security headers for protected routes too
+  const protectedResponse = NextResponse.next()
+  const headers = protectedResponse.headers
+  
+  headers.set('X-Frame-Options', 'DENY')
+  headers.set('X-Content-Type-Options', 'nosniff')
+  headers.set('X-XSS-Protection', '1; mode=block')
+  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  
+  return protectedResponse
 }
 
 export const config = {

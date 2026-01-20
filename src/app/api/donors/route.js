@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 // GET all donors
 export async function GET() {
   try {
-    console.log('Fetching all donors...')
+    logger.info('Fetching all donors')
     
     const donors = await prisma.donor.findMany({
       include: {
@@ -26,13 +27,12 @@ export async function GET() {
       }
     })
     
-    console.log(`Successfully fetched ${donors.length} donors`)
+    logger.info('Successfully fetched donors', { count: donors.length })
     return NextResponse.json(donors)
   } catch (error) {
-    console.error('Error fetching donors:', error)
+    logger.error('Error fetching donors', { error: error.message, stack: error.stack })
     return NextResponse.json({ 
-      error: 'Failed to fetch donors', 
-      details: error.message 
+      error: 'Failed to fetch donors'
     }, { status: 500 })
   }
 }
@@ -42,7 +42,7 @@ export async function POST(request) {
   try {
     const data = await request.json()
     
-    console.log('Creating donor with data:', data)
+    logger.info('Creating donor', { email: data.email })
     
     // Ensure required fields and set defaults for new schema fields
     const donorData = {
@@ -77,13 +77,12 @@ export async function POST(request) {
       }
     })
     
-    console.log('Successfully created donor:', donor.id)
+    logger.info('Successfully created donor', { donorId: donor.id })
     return NextResponse.json(donor, { status: 201 })
   } catch (error) {
-    console.error('Error creating donor:', error)
+    logger.error('Error creating donor', { error: error.message, stack: error.stack })
     return NextResponse.json({ 
-      error: 'Failed to create donor', 
-      details: error.message 
+      error: 'Failed to create donor'
     }, { status: 500 })
   }
 }

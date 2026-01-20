@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 // GET all donations
 export async function GET() {
@@ -106,7 +107,7 @@ export async function POST(request) {
     
     return NextResponse.json(result, { status: 201 })
   } catch (error) {
-    console.error('Error creating donation:', error)
+    logger.error('Error creating donation', { error: error.message, stack: error.stack })
     return NextResponse.json({ error: 'Failed to create donation' }, { status: 500 })
   }
 }

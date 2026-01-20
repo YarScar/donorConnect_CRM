@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 // GET single donor
 export async function GET(request, { params }) {
@@ -22,6 +23,7 @@ export async function GET(request, { params }) {
     
     return NextResponse.json(donor)
   } catch (error) {
+    logger.error('Error fetching donor', { donorId: params.id, error: error.message })
     return NextResponse.json({ error: 'Failed to fetch donor' }, { status: 500 })
   }
 }
@@ -31,7 +33,7 @@ export async function PUT(request, { params }) {
   try {
     const data = await request.json()
     
-    console.log('Updating donor with ID:', params.id, 'Data:', data)
+    logger.info('Updating donor', { donorId: params.id })
     
     // Filter out undefined values and handle new schema fields
     const updateData = Object.fromEntries(
@@ -56,13 +58,12 @@ export async function PUT(request, { params }) {
       }
     })
     
-    console.log('Successfully updated donor:', donor.id)
+    logger.info('Successfully updated donor', { donorId: donor.id })
     return NextResponse.json(donor)
   } catch (error) {
-    console.error('Error updating donor:', error)
+    logger.error('Error updating donor', { donorId: params.id, error: error.message })
     return NextResponse.json({ 
-      error: 'Failed to update donor', 
-      details: error.message 
+      error: 'Failed to update donor'
     }, { status: 500 })
   }
 }

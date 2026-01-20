@@ -1,6 +1,7 @@
 import { hash } from 'bcryptjs'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 export async function POST(request) {
   try {
@@ -48,7 +49,7 @@ export async function POST(request) {
       { status: 201 }
     )
   } catch (error) {
-    console.error('Signup error:', error)
+    logger.error('Signup error', { error: error.message, stack: error.stack })
     return NextResponse.json(
       { error: 'Failed to create user' },
       { status: 500 }

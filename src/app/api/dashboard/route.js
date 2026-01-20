@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 export async function GET() {
   try {
@@ -125,12 +124,10 @@ export async function GET() {
       }))
     })
   } catch (error) {
-    console.error('Dashboard API Error:', error)
+    logger.error('Dashboard API Error', { error: error.message, stack: error.stack })
     return NextResponse.json(
       { error: 'Failed to load dashboard data' },
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect()
   }
 }

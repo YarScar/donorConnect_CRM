@@ -22,11 +22,14 @@ export default function Navigation() {
   const [status, setStatus] = useState('loading')
   const router = useRouter()
 
+  // Fetch session on mount and when pathname changes (after login redirect)
   useEffect(() => {
     let mounted = true
-    ;(async () => {
+    const fetchSession = async () => {
       try {
-        const res = await fetch('/api/auth/me')
+        const res = await fetch('/api/auth/me', {
+          credentials: 'include' // Ensure cookies are sent
+        })
         if (!mounted) return
         if (!res.ok) {
           setSession(null)
@@ -42,12 +45,16 @@ export default function Navigation() {
           setStatus('unauthenticated')
         }
       } catch (e) {
-        setSession(null)
-        setStatus('unauthenticated')
+        if (mounted) {
+          setSession(null)
+          setStatus('unauthenticated')
+        }
       }
-    })()
+    }
+    
+    fetchSession()
     return () => { mounted = false }
-  }, [])
+  }, [pathname]) // Re-fetch when pathname changes (after navigation/login)
 
   const isActive = (path) => pathname === path || pathname.startsWith(path + '/')
 
@@ -56,6 +63,8 @@ export default function Navigation() {
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' })
+    setSession(null)
+    setStatus('unauthenticated')
     router.push('/auth/login')
   }
 

@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import OpenAI from 'openai'
+import { logger } from '@/lib/logger'
 
-const prisma = new PrismaClient()
-
-// Initialize OpenAI client - in production, this would use environment variables
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'your-api-key-here',
-  // Allow browser usage in test environment
+// Initialize OpenAI client
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+const openai = OPENAI_API_KEY ? new OpenAI({
+  apiKey: OPENAI_API_KEY,
   dangerouslyAllowBrowser: process.env.NODE_ENV === 'test'
-})
+}) : null
 
 export async function POST(request) {
   try {
@@ -133,12 +132,18 @@ Provide upgrade assessment including:
     }
 
     // For demo purposes, if no OpenAI key is available, return mock analysis
-    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your-api-key-here') {
+    const OPENAI_KEY = process.env.OPENAI_API_KEY
+    const OPENAI_MODEL = process.env.OPENAI_MODEL
+
+    if (!OPENAI_KEY || !OPENAI_MODEL || !openai) {
+      if (!OPENAI_MODEL && OPENAI_KEY) {
+        logger.warn('OPENAI_MODEL not set, using mock analysis')
+      }
       analysis = generateMockAnalysis(type, donor, donorSummary)
     } else {
       try {
         const completion = await openai.chat.completions.create({
-          model: "gpt-3.5-turbo",
+          model: OPENAI_MODEL,
           messages: [
             {
               role: "system",
@@ -155,7 +160,8 @@ Provide upgrade assessment including:
 
         analysis = completion.choices[0].message.content
       } catch (aiError) {
-        console.error('OpenAI API Error:', aiError)
+        logger.error('OpenAI API Error', { error: aiError.message, donorId })
+        // If model not available or permission denied, fall back to mock
         analysis = generateMockAnalysis(type, donor, donorSummary)
       }
     }
@@ -173,13 +179,11 @@ Provide upgrade assessment including:
     })
 
   } catch (error) {
-    console.error('AI Analysis Error:', error)
+    logger.error('AI Analysis Error', { error: error.message, stack: error.stack })
     return NextResponse.json(
       { error: 'Failed to generate AI analysis' },
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect()
   }
 }
 

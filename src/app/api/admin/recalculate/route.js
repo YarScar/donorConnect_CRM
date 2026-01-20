@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 // POST recalculate all totals and derived fields
 export async function POST(request) {
   try {
-    console.log('Starting data recalculation...')
+    logger.info('Starting data recalculation')
     
     const result = await prisma.$transaction(async (tx) => {
       // Get all donors
@@ -90,7 +91,7 @@ export async function POST(request) {
       }
     })
     
-    console.log('Data recalculation completed:', result)
+    logger.info('Data recalculation completed', result)
     return NextResponse.json({
       success: true,
       message: 'Data recalculation completed successfully',
@@ -98,10 +99,9 @@ export async function POST(request) {
     })
     
   } catch (error) {
-    console.error('Error recalculating data:', error)
+    logger.error('Error recalculating data', { error: error.message, stack: error.stack })
     return NextResponse.json({ 
-      error: 'Failed to recalculate data',
-      details: error.message 
+      error: 'Failed to recalculate data'
     }, { status: 500 })
   }
 }
