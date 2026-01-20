@@ -68,6 +68,17 @@ export default function Navigation() {
     router.push('/auth/login')
   }
 
+  const handleHomeClick = async (e) => {
+    e.preventDefault()
+    if (status === 'authenticated') {
+      // Log out when going home if authenticated
+      await fetch('/api/auth/logout', { method: 'POST' })
+      setSession(null)
+      setStatus('unauthenticated')
+    }
+    router.push('/')
+  }
+
   // Filter menu links based on user role
   const filteredMenuLinks = session?.user?.role === 'ADMIN'
     ? menuLinks
@@ -332,7 +343,7 @@ export default function Navigation() {
       <nav className="hamburger-nav">
         <div className="hamburger-nav-container">
           <div className="hamburger-nav-brand">
-            <Link href="/" className="hamburger-brand-link">
+            <Link href="/" className="hamburger-brand-link" onClick={handleHomeClick}>
               <span className="hamburger-brand-icon">🤝</span>
               <span>DonorConnect</span>
             </Link>
