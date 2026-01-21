@@ -101,6 +101,8 @@ export default function Navigation() {
           top: 0;
           z-index: 1000;
           overflow-x: hidden;
+          width: 100%;
+          left: 0;
         }
 
         .hamburger-nav-container {

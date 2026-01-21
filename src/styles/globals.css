@@ -68,6 +68,18 @@ html, body {
   transition: all 0.3s ease;
 }
 
+@media (max-width: 420px) {
+  .header { padding: 20px 12px; border-radius: 12px; }
+  .container { padding: 12px; }
+}
+
+/* Ensure navigation bar always spans the full viewport and isn't clipped */
+.hamburger-nav {
+  width: 100%;
+  left: 0;
+  right: 0;
+}
+
 .header::before {
   content: '';
   position: absolute;
