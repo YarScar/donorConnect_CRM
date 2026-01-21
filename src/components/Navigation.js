@@ -100,10 +100,7 @@ export default function Navigation() {
           position: sticky;
           top: 0;
           z-index: 1000;
-          overflow-x: hidden;
-          width: 100%;
-          left: 0;
-          overflow: visible; /* allow dropdown to escape */
+          overflow: visible; /* allow dropdown to render outside */
         }
 
         .hamburger-nav-container {
@@ -115,6 +112,7 @@ export default function Navigation() {
           align-items: center;
           height: 70px;
           position: relative;
+          overflow: visible;
         }
 
         .hamburger-nav-brand {
@@ -147,7 +145,7 @@ export default function Navigation() {
         }
 
         .auth-btn {
-          padding: 0.5rem 1rem;
+          padding: 0.5rem 1.25rem;
           background: rgba(255, 255, 255, 0.2);
           color: white;
           border: 2px solid rgba(255, 255, 255, 0.5);
@@ -158,7 +156,6 @@ export default function Navigation() {
           text-decoration: none;
           transition: all 0.3s ease;
           white-space: nowrap;
-          box-sizing: border-box;
         }
 
         .auth-btn:hover {
@@ -173,7 +170,16 @@ export default function Navigation() {
           gap: 0.5rem;
           color: white;
           font-size: 0.85rem;
-          min-width: 0; /* allow flex children to shrink */
+          min-width: 0; /* allow shrinking */
+        }
+
+        /* truncate email to keep header compact on narrow screens */
+        .user-info span:first-child {
+          max-width: 160px;
+          display: inline-block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .user-role {
@@ -184,22 +190,9 @@ export default function Navigation() {
           font-size: 0.75rem;
         }
 
-        /* Truncate long emails so they don't push the hamburger off-screen */
-        .user-info span:first-child {
-          max-width: 160px;
-          display: inline-block;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          vertical-align: middle;
-        }
-
         .hamburger-dropdown {
-          position: relative; /* keep menu positioned relative to this */
+          position: relative;
         }
-
-        /* ensure the toggle appears above other content */
-        .hamburger-btn { z-index: 2001; }
 
         .hamburger-btn {
           display: flex;
@@ -243,23 +236,24 @@ export default function Navigation() {
 
         .hamburger-menu {
           position: absolute;
-          top: 100%;
-          right: 0;
-          margin-top: 0.5rem;
-          width: 280px;
+          top: calc(100% + 8px);
+          right: 12px;
+          width: min(320px, calc(100vw - 24px));
           max-height: 0;
           overflow: hidden;
           background: white;
           border-radius: 12px;
           box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-          transition: max-height 0.4s ease, opacity 0.3s ease;
+          transition: max-height 0.36s ease, opacity 0.2s ease, transform 0.2s ease;
           opacity: 0;
-          z-index: 999;
+          transform: translateY(-6px);
+          z-index: 3000; /* ensure it appears above other content */
         }
 
         .hamburger-menu.open {
-          max-height: 500px;
+          max-height: 600px;
           opacity: 1;
+          transform: translateY(0);
         }
 
         .hamburger-list {
@@ -336,11 +330,10 @@ export default function Navigation() {
 
         @media (max-width: 768px) {
           .hamburger-brand-link {
-            font-size: 1.1rem;
-            gap: 0.4rem;
+            font-size: 1.2rem;
           }
           .hamburger-brand-icon {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
           }
           .auth-btn, .user-info {
             font-size: 0.8rem;
@@ -348,22 +341,15 @@ export default function Navigation() {
           .user-role {
             display: none;
           }
-          .hamburger-nav-container { padding: 0 12px; height: auto; overflow: visible; }
-          .hamburger-right-section { gap: 0.5rem; }
         }
 
         @media (max-width: 480px) {
           .hamburger-menu {
-            /* make menu fit within the viewport */
-            width: min(320px, calc(100% - 24px));
-            right: 12px;
+            width: 260px;
           }
           .auth-btn {
-            padding: 0.35rem 0.75rem;
-            white-space: normal;
-            max-width: 160px;
+            padding: 0.4rem 0.875rem;
           }
-          .hamburger-nav-container { padding: 0 8px; }
         }
       `}</style>
 
