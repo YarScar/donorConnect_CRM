@@ -172,6 +172,7 @@ export default function Navigation() {
           gap: 0.5rem;
           color: white;
           font-size: 0.85rem;
+          min-width: 0; /* allow flex children to shrink */
         }
 
         .user-role {
@@ -182,9 +183,31 @@ export default function Navigation() {
           font-size: 0.75rem;
         }
 
+        /* Truncate long emails so they don't push the hamburger off-screen */
+        .user-info span:first-child {
+          max-width: 160px;
+          display: inline-block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          vertical-align: middle;
+        }
+
         .hamburger-dropdown {
           position: relative;
         }
+
+        /* Keep the hamburger toggle visually available by anchoring it to the right edge */
+        .hamburger-dropdown {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 1002;
+        }
+
+        /* make room on the right for the absolutely-positioned toggle */
+        .hamburger-right-section { padding-right: 48px; }
 
         .hamburger-btn {
           display: flex;
@@ -334,7 +357,7 @@ export default function Navigation() {
             display: none;
           }
           .hamburger-nav-container { padding: 0 12px; height: auto; }
-          .hamburger-right-section { gap: 0.5rem; }
+          .hamburger-right-section { gap: 0.5rem; padding-right: 56px; }
         }
 
         @media (max-width: 480px) {
