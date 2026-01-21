@@ -238,6 +238,7 @@ export default function Navigation() {
           position: absolute;
           top: calc(100% + 8px);
           right: 12px;
+          left: auto;
           width: min(320px, calc(100vw - 24px));
           max-height: 0;
           overflow: hidden;
@@ -247,6 +248,7 @@ export default function Navigation() {
           transition: max-height 0.36s ease, opacity 0.2s ease, transform 0.2s ease;
           opacity: 0;
           transform: translateY(-6px);
+          transform-origin: top right;
           z-index: 3000; /* ensure it appears above other content */
         }
 
@@ -341,14 +343,37 @@ export default function Navigation() {
           .user-role {
             display: none;
           }
+          /* On narrower viewports, fix the dropdown to the viewport so it never overflows */
+          .hamburger-menu {
+            position: fixed;
+            top: 74px; /* just below the header */
+            right: 12px;
+            left: auto;
+            width: min(320px, calc(100vw - 24px));
+            max-height: calc(100vh - 90px);
+            overflow: auto;
+          }
+          .hamburger-menu.open {
+            max-height: calc(100vh - 90px);
+          }
+          .hamburger-list {
+            padding-right: 0.25rem;
+          }
         }
 
         @media (max-width: 480px) {
           .hamburger-menu {
-            width: 260px;
+            width: calc(100vw - 20px);
+            right: 10px;
+            left: 10px;
+            border-radius: 10px;
           }
           .auth-btn {
             padding: 0.4rem 0.875rem;
+          }
+          .hamburger-nav-link {
+            padding: 0.6rem 0.9rem;
+            font-size: 0.92rem;
           }
         }
       `}</style>
