@@ -100,12 +100,13 @@ export default function Navigation() {
           position: sticky;
           top: 0;
           z-index: 1000;
+          overflow-x: hidden;
         }
 
         .hamburger-nav-container {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 0 1.5rem;
+          padding: 0 1rem;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -143,7 +144,7 @@ export default function Navigation() {
         }
 
         .auth-btn {
-          padding: 0.5rem 1.25rem;
+          padding: 0.5rem 1rem;
           background: rgba(255, 255, 255, 0.2);
           color: white;
           border: 2px solid rgba(255, 255, 255, 0.5);
@@ -154,6 +155,7 @@ export default function Navigation() {
           text-decoration: none;
           transition: all 0.3s ease;
           white-space: nowrap;
+          box-sizing: border-box;
         }
 
         .auth-btn:hover {
@@ -317,10 +319,11 @@ export default function Navigation() {
 
         @media (max-width: 768px) {
           .hamburger-brand-link {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            gap: 0.4rem;
           }
           .hamburger-brand-icon {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
           }
           .auth-btn, .user-info {
             font-size: 0.8rem;
@@ -328,15 +331,22 @@ export default function Navigation() {
           .user-role {
             display: none;
           }
+          .hamburger-nav-container { padding: 0 12px; height: auto; }
+          .hamburger-right-section { gap: 0.5rem; }
         }
 
         @media (max-width: 480px) {
           .hamburger-menu {
-            width: 260px;
+            /* make menu fit within the viewport */
+            width: min(320px, calc(100% - 24px));
+            right: 12px;
           }
           .auth-btn {
-            padding: 0.4rem 0.875rem;
+            padding: 0.35rem 0.75rem;
+            white-space: normal;
+            max-width: 160px;
           }
+          .hamburger-nav-container { padding: 0 8px; }
         }
       `}</style>
 
