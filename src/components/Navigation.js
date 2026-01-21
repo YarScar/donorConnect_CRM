@@ -103,6 +103,7 @@ export default function Navigation() {
           overflow-x: hidden;
           width: 100%;
           left: 0;
+          overflow: visible; /* allow dropdown to escape */
         }
 
         .hamburger-nav-container {
@@ -194,20 +195,11 @@ export default function Navigation() {
         }
 
         .hamburger-dropdown {
-          position: relative;
+          position: relative; /* keep menu positioned relative to this */
         }
 
-        /* Keep the hamburger toggle visually available by anchoring it to the right edge */
-        .hamburger-dropdown {
-          position: absolute;
-          right: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          z-index: 1002;
-        }
-
-        /* make room on the right for the absolutely-positioned toggle */
-        .hamburger-right-section { padding-right: 48px; }
+        /* ensure the toggle appears above other content */
+        .hamburger-btn { z-index: 2001; }
 
         .hamburger-btn {
           display: flex;
@@ -356,8 +348,8 @@ export default function Navigation() {
           .user-role {
             display: none;
           }
-          .hamburger-nav-container { padding: 0 12px; height: auto; }
-          .hamburger-right-section { gap: 0.5rem; padding-right: 56px; }
+          .hamburger-nav-container { padding: 0 12px; height: auto; overflow: visible; }
+          .hamburger-right-section { gap: 0.5rem; }
         }
 
         @media (max-width: 480px) {
