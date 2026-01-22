@@ -24,6 +24,21 @@ export default async function Evidence() {
           </div>
         </section>
 
+        <section className="rba-note">
+          <h2>[RBA for LP Staff Only] Help instructors rate you easily and fairly</h2>
+          <div className="evidence-card">
+            <h3>Instructor Access (Use these accounts to review the app)</h3>
+            <div className="evidence-content">
+              <ul>
+                <li>rob@launchpadphilly.org → lpuser1</li>
+                <li>sanaa@launchpadphilly.org → lpuser2</li>
+                <li>taheera@launchpadphilly.org → lpuser3</li>
+              </ul>
+              <p className="small"><em>These are demonstration reviewer accounts for LaunchPad staff.</em></p>
+            </div>
+          </div>
+        </section>
+
         <section className="ccc-evidence">
           <h2 className="evidence-section-title">🎯 CCC.1.3 Evidence - Working MVP with Multiple Pages</h2>
           
@@ -352,13 +367,11 @@ export default async function Evidence() {
                 </div>
 
                 <div className="link-category">
-                  <h4>📚 Documentation</h4>
+                  <h4>📚 Documentation (Consolidated in Figma)</h4>
                   <div className="link-list">
-                    <Link href="/about" className="evidence-link">
-                      📖 Problem Analysis →
-                    </Link>
-                    <Link href="/why-donorconnect" className="evidence-link">
-                      🎯 Solution Documentation →
+                    {/* Primary documentation + planning are consolidated in Figma */}
+                    <Link href="https://www.figma.com/design/v0i8kEHp3CQFKTkNO0uNkL/Untitled?node-id=0-1&t=bcgbU8DAMuDIVmrT-1" className="external-link" target="_blank">
+                      🎨 Figma — System Architecture, Business Context, Wireframes & Docs →
                     </Link>
                     <Link href="/ai-policy" className="evidence-link">
                       🤖 AI Implementation Details →
@@ -384,17 +397,68 @@ export default async function Evidence() {
                 <div className="link-category">
                   <h4>🏗️ Project Planning</h4>
                   <div className="link-list">
-                    <a href="#" className="external-link disabled">
-                      📋 Trello Project Board → (Demo)
-                    </a>
-                    <a href="#" className="external-link disabled">
-                      📐 Wireframes & Mockups → (Demo)
-                    </a>
+                    {/* Link: Figma (system architecture, wireframes, evidence) - replace URL */}
+                    <Link href="https://www.figma.com/design/v0i8kEHp3CQFKTkNO0uNkL/Untitled?node-id=0-1&t=bcgbU8DAMuDIVmrT-1" className="external-link" target="_blank">
+                      🎨 Figma - System Architecture & Wireframes →
+                    </Link>
+                    {/* Link: Trello Project Board - replace URL */}
+                    <Link href="https://trello.com/invite/b/69417db3e37b4ef69165e0f6/ATTI41ac2c9c232999f1dcea4e1d44328f9c96777E7D/donor-crm" className="external-link" target="_blank">
+                      📋 Trello Project Board →
+                    </Link>
+                    {/* Link: Development Reflection — /reflection */}
                     <Link href="/reflection" className="evidence-link">
                       💭 Development Reflection →
                     </Link>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="rubric-items">
+          <h2 className="evidence-section-title">📝 Rubric Items (CCC)</h2>
+          <div className="evidence-card">
+            <h3>CCC.1.1 — Problem Definition and Target Users</h3>
+            <div className="evidence-content">
+              <p><strong>Where to see it in my project:</strong> Problem Page and README section 2</p>
+                <div className="evidence-links">
+                  {/* Link: Problem Page — /about (also summarized in Figma) */}
+                  <Link href="/about" className="evidence-link">View Problem Page (/about) →</Link>
+                  {/* Link: README (section 2) — GitHub repository README */}
+                  <Link href="https://github.com/your-username/donorconnect-crm#readme" className="external-link" target="_blank">README (section 2) →</Link>
+                  {/* Link: Figma - comprehensive documentation and planning */}
+                  <Link href="https://www.figma.com/design/v0i8kEHp3CQFKTkNO0uNkL/Untitled?node-id=0-1&t=bcgbU8DAMuDIVmrT-1" className="external-link" target="_blank">🎨 Figma — Docs & Wireframes →</Link>
+                </div>
+            </div>
+          </div>
+
+          <div className="evidence-card">
+            <h3>CCC.1.2 — Design & Wireframes</h3>
+            <div className="evidence-content">
+              <p><strong>Where to see it in my project:</strong> Uploaded/linked wireframes and planning notes</p>
+              <div className="evidence-links">
+                {/* Link: Figma - primary source for design & wireframes */}
+                <Link href="https://www.figma.com/design/v0i8kEHp3CQFKTkNO0uNkL/Untitled?node-id=0-1&t=bcgbU8DAMuDIVmrT-1" className="external-link" target="_blank">🎨 Figma — Wireframes & Planning →</Link>
+                {/* Link: Planning & Reflection — /reflection (supplementary) */}
+                <Link href="/reflection" className="evidence-link">Planning & Reflection →</Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="evidence-card">
+            <h3>CCC.1.3 — Working MVP with Multiple Pages</h3>
+            <div className="evidence-content">
+              <p><strong>Where to see it in my project:</strong> Home, Dashboard, Donors, Donations (live app flows)</p>
+              <div className="evidence-links">
+                {/* Link: Home — / */}
+                <Link href="/" className="evidence-link">Home →</Link>
+                {/* Link: Dashboard — /dashboard */}
+                <Link href="/dashboard" className="evidence-link">Dashboard →</Link>
+                {/* Link: Donors list — /donors */}
+                <Link href="/donors" className="evidence-link">Donors →</Link>
+                {/* Link: Donations list — /donations */}
+                <Link href="/donations" className="evidence-link">Donations →</Link>
               </div>
             </div>
           </div>

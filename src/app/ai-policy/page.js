@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
 
 export default function AIPolicy() {
   return (
@@ -10,8 +9,6 @@ export default function AIPolicy() {
         <h1>AI Policy & Safeguards</h1>
         <p className="tagline">Responsible AI Integration in DonorConnect</p>
       </header>
-
-      <Navigation />
 
       <main className="main">
         <section className="policy-overview">
