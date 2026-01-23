@@ -8,6 +8,7 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 export default function EventsPage() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(true) // demo admin flag
 
   useEffect(() => {
     fetchEvents()
@@ -22,6 +23,37 @@ export default function EventsPage() {
       console.error('Error fetching events:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (!isAdmin) return alert('Only administrators can delete events.')
+    if (!confirm('Delete this event? This will remove it permanently.')) return
+
+    try {
+      const res = await fetch(`/api/events/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Delete failed')
+      await fetchEvents()
+    } catch (error) {
+      console.error('Error deleting event:', error)
+    }
+  }
+
+  const handleEdit = async (event) => {
+    if (!isAdmin) return alert('Only administrators can edit events.')
+    const name = prompt('Event name', event.name)
+    if (name === null) return
+    const description = prompt('Description', event.description || '')
+    try {
+      const res = await fetch(`/api/events/${event.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...event, name, description })
+      })
+      if (!res.ok) throw new Error('Update failed')
+      await fetchEvents()
+    } catch (error) {
+      console.error('Error updating event:', error)
     }
   }
 
@@ -58,6 +90,12 @@ export default function EventsPage() {
               <p><strong>Capacity:</strong> {event.capacity || 'N/A'}</p>
               <p><strong>Attendees:</strong> {event.attendees || 0}</p>
               <p><strong>Donations:</strong> ${calculateTotal(event.donations)} ({event.donations.length})</p>
+              {isAdmin && (
+                <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                  <button className="btn btn-edit" onClick={() => handleEdit(event)}>Edit</button>
+                  <button className="btn btn-delete" onClick={() => handleDelete(event.id)}>Delete</button>
+                </div>
+              )}
             </div>
           </div>
         ))}

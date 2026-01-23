@@ -13,19 +13,18 @@ export default function DonationsPage() {
   const [isAdmin, setIsAdmin] = useState(true) // For demo purposes
   const [filterStatus, setFilterStatus] = useState('all')
   const [sortBy, setSortBy] = useState('date-desc')
-
-  useEffect(() => {
-    const fetchDonations = async () => {
+  // Fetch donations and enhance for UI
+  const fetchDonations = async () => {
     try {
+      setLoading(true)
       const response = await fetch('/api/donations')
       const data = await response.json()
-      
-      // Enhance data with calculated fields
+
       const enhancedDonations = data.map(donation => ({
         ...donation,
         donorRiskLevel: calculateDonorRiskLevel(donation.donor)
       }))
-      
+
       setDonations(enhancedDonations)
       applyFiltersAndSorting(enhancedDonations)
     } catch (error) {
@@ -33,7 +32,9 @@ export default function DonationsPage() {
     } finally {
       setLoading(false)
     }
-    }
+  }
+
+  useEffect(() => {
     fetchDonations()
   }, [])
 
@@ -121,8 +122,9 @@ export default function DonationsPage() {
     
     if (confirm('Are you sure you want to delete this donation? This action cannot be undone.')) {
       try {
-        await fetch(`/api/donations/${id}`, { method: 'DELETE' })
-        fetchDonations()
+        const res = await fetch(`/api/donations/${id}`, { method: 'DELETE' })
+        if (!res.ok) throw new Error('Delete failed')
+        await fetchDonations()
       } catch (error) {
         console.error('Error deleting donation:', error)
       }

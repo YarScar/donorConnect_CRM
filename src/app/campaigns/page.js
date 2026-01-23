@@ -8,6 +8,7 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 export default function CampaignsPage() {
   const [campaigns, setCampaigns] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(true) // demo admin flag
 
   useEffect(() => {
     fetchCampaigns()
@@ -22,6 +23,41 @@ export default function CampaignsPage() {
       console.error('Error fetching campaigns:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (!isAdmin) {
+      alert('Only administrators can delete campaigns.')
+      return
+    }
+
+    if (!confirm('Delete this campaign? This will remove it permanently.')) return
+
+    try {
+      const res = await fetch(`/api/campaigns/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Delete failed')
+      await fetchCampaigns()
+    } catch (error) {
+      console.error('Error deleting campaign:', error)
+    }
+  }
+
+  const handleEdit = async (campaign) => {
+    if (!isAdmin) return alert('Only admins can edit campaigns.')
+    const name = prompt('Campaign name', campaign.name)
+    if (name === null) return
+    const description = prompt('Description', campaign.description || '')
+    try {
+      const res = await fetch(`/api/campaigns/${campaign.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...campaign, name, description })
+      })
+      if (!res.ok) throw new Error('Update failed')
+      await fetchCampaigns()
+    } catch (error) {
+      console.error('Error updating campaign:', error)
     }
   }
 
@@ -58,6 +94,12 @@ export default function CampaignsPage() {
               <p><strong>Start:</strong> {formatDate(campaign.startDate)}</p>
               <p><strong>End:</strong> {formatDate(campaign.endDate)}</p>
               <p><strong>Donations:</strong> {campaign.donations.length}</p>
+              {isAdmin && (
+                <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                  <button className="btn btn-edit" onClick={() => handleEdit(campaign)}>Edit</button>
+                  <button className="btn btn-delete" onClick={() => handleDelete(campaign.id)}>Delete</button>
+                </div>
+              )}
             </div>
           </div>
         ))}

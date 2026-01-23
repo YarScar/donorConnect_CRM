@@ -15,35 +15,32 @@ export default function DonorsPage() {
   const [aiInsights, setAiInsights] = useState({})
   const [loadingInsights, setLoadingInsights] = useState({})
   const [selectedInsight, setSelectedInsight] = useState(null)
-
-  useEffect(() => {
-    const fetchDonors = async () => {
+  // Fetch donors from the API and enhance data for display
+  const fetchDonors = async () => {
     try {
+      setLoading(true)
       console.log('Fetching donors from API...')
       const response = await fetch('/api/donors')
       const data = await response.json()
-      
+
       console.log('API Response:', data)
-      console.log('Number of donors from API:', data.length)
-      
-      if (data.error) {
+      if (data?.error) {
         console.error('API returned error:', data)
         return
       }
-      
-      // Enhance data with calculated fields using database values where available
+
       const enhancedDonors = data.map(donor => ({
         ...donor,
         totalGifts: donor.donations?.length || 0,
-        totalAmount: donor.totalDonated || 0, // Use database field
+        totalAmount: donor.totalDonated || 0,
         riskLevel: calculateRiskLevel(donor),
-        lastDonationDate: donor.lastDonation ? new Date(donor.lastDonation) : null, // Use database field
+        lastDonationDate: donor.lastDonation ? new Date(donor.lastDonation) : null,
         activeFollowUps: donor.followUps?.filter(fu => fu.status === 'Pending' || fu.status === 'In Progress').length || 0,
         completedFollowUps: donor.followUps?.filter(fu => fu.status === 'Completed').length || 0
       }))
-      
+
       console.log('Enhanced donors:', enhancedDonors.map(d => `${d.firstName} ${d.lastName} - $${d.totalAmount}`))
-      
+
       setDonors(enhancedDonors)
       setFilteredDonors(enhancedDonors)
     } catch (error) {
@@ -51,7 +48,9 @@ export default function DonorsPage() {
     } finally {
       setLoading(false)
     }
-    }
+  }
+
+  useEffect(() => {
     fetchDonors()
   }, [])
 
@@ -82,8 +81,10 @@ export default function DonorsPage() {
     
     if (confirm('Are you sure you want to delete this donor? This action cannot be undone.')) {
       try {
-        await fetch(`/api/donors/${id}`, { method: 'DELETE' })
-        fetchDonors()
+        const res = await fetch(`/api/donors/${id}`, { method: 'DELETE' })
+        if (!res.ok) throw new Error('Delete failed')
+        // Refresh donors list after successful delete
+        await fetchDonors()
       } catch (error) {
         console.error('Error deleting donor:', error)
       }
