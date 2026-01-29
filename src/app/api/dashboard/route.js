@@ -105,6 +105,15 @@ export async function GET() {
       monthlyGrowth[month] = (monthlyGrowth[month] || 0) + item._count
     })
 
+    logger.info('Dashboard snapshot', {
+      totalDonors,
+      totalDonations,
+      totalCampaigns,
+      totalEvents,
+      recentDonations: recentDonations.length,
+      topDonorsCount: donorsWithTotals.length
+    })
+
     return NextResponse.json({
       summary: {
         totalDonors,
