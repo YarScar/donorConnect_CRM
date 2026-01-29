@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navigation from '@/components/Navigation'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import BackButton from '@/components/BackButton'
 
 export default function DonorDetailPage({ params }) {
   const router = useRouter()
@@ -36,6 +37,7 @@ export default function DonorDetailPage({ params }) {
 
   return (
     <div className="container">
+      <BackButton fallback="/donors" />
       
       <div className="card">
         <div className="card-header">

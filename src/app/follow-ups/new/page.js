@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navigation from '@/components/Navigation'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import BackButton from '@/components/BackButton'
 
 export default function NewFollowUpPage() {
   const router = useRouter()
@@ -73,6 +74,7 @@ export default function NewFollowUpPage() {
 
   return (
     <div className="container">
+      <BackButton fallback="/follow-ups" />
       <h1>Add New Follow-up</h1>
 
       <form className="form" onSubmit={handleSubmit}>

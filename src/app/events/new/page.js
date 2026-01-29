@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navigation from '@/components/Navigation'
+import BackButton from '@/components/BackButton'
 
 export default function NewEventPage() {
   const router = useRouter()
@@ -58,6 +59,7 @@ export default function NewEventPage() {
 
   return (
     <div className="container">
+      <BackButton fallback="/events" />
       <h1>Add New Event</h1>
 
       <form className="form" onSubmit={handleSubmit}>

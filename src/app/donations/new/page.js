@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Navigation from '@/components/Navigation'
 import DonationForm from '@/components/DonationForm'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import BackButton from '@/components/BackButton'
 
 export default function NewDonationPage() {
   const [donors, setDonors] = useState([])
@@ -37,6 +38,7 @@ export default function NewDonationPage() {
 
   return (
     <div className="container">
+      <BackButton fallback="/donations" />
       <h1>Add New Donation</h1>
       <DonationForm donors={donors} campaigns={campaigns} events={events} />
     </div>

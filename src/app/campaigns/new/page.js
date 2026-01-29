@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navigation from '@/components/Navigation'
+import BackButton from '@/components/BackButton'
 
 export default function NewCampaignPage() {
   const router = useRouter()
@@ -54,6 +55,7 @@ export default function NewCampaignPage() {
 
   return (
     <div className="container">
+      <BackButton fallback="/campaigns" />
       <h1>Add New Campaign</h1>
 
       <form className="form" onSubmit={handleSubmit}>

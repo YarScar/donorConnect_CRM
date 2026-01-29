@@ -307,6 +307,39 @@ body {
   transform: translateY(0) scale(0.98);
 }
 
+/* Back button (circular blue with thick arrow) */
+.back-button {
+  width: 40px;
+  height: 40px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  outline: none;
+  margin-bottom: 1rem;
+}
+
+.back-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: var(--primary-hover);
+}
+
+.back-button:active { transform: translateY(0); }
+
+.back-button svg { display: block; width: 18px; height: 18px; }
+
+.back-button:focus { box-shadow: 0 0 0 6px rgba(59,130,246,0.12); }
+
+.back-button::before { display: none; }
+
 .btn-secondary {
   background: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
   color: var(--primary-dark);
