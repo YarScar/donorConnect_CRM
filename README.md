@@ -7,8 +7,8 @@ DonorConnect transforms traditional donor management from spreadsheet chaos into
 ## 🏗️ Architecture & Technology Stack
 
 **Frontend Framework:** Next.js 14 with React  
-**Database:** Prisma ORM with SQLite  
-**AI Integration:** OpenAI GPT-3.5 Turbo API  
+**Database:** Prisma ORM with PostgreSQL (configured via `DATABASE_URL`)  
+**AI Integration:** OpenAI (official `openai` npm SDK — supports `gpt-4` and `gpt-3.5-turbo`)  
 **Styling:** Custom CSS with responsive design  
 **Data Visualization:** Recharts library  
 **Authentication:** Role-based access control system
@@ -77,7 +77,7 @@ DonorConnect implements AI technology with strict ethical guidelines:
 - Detailed responsible AI implementation guidelines
 
 ### **TS.6.3 - AI System Integration**
-- Working AI analysis system with [OpenAI API integration](src/app/api/ai/donor-analysis/route.js)
+- Working AI analysis system using the official `openai` SDK ([src/app/api/ai/donor-analysis/route.js](src/app/api/ai/donor-analysis/route.js))
 - Multi-layered AI insights for donor management and fundraising optimization
 
 ## 🎯 User Experience Design
@@ -125,7 +125,7 @@ DonorConnect provides a seamless experience across all devices:
 ### **Prerequisites**
 - Node.js (version 18 or later)
 - npm or yarn package manager
-- SQLite (included with Prisma)
+- PostgreSQL (local or hosted) — configured via `DATABASE_URL`
 - OpenAI API key (for AI features)
 
 ### **Quick Start**
@@ -143,15 +143,23 @@ DonorConnect provides a seamless experience across all devices:
 
 3. **Environment Configuration**
    ```bash
-   # Create .env.local file with:
+   # Create .env.local file with something like:
    OPENAI_API_KEY=your_openai_api_key_here
-   DATABASE_URL="file:./dev.db"
+   # Example for a local Postgres database:
+   DATABASE_URL="postgresql://user:password@localhost:5432/donorconnect_dev"
    ```
 
 4. **Database Setup**
+   For development you can push the current schema and seed sample data:
    ```bash
    npx prisma generate
    npx prisma db push
+   npx prisma db seed
+   ```
+   If you prefer to use Prisma migrations (migrations are included in `prisma/migrations`), run:
+   ```bash
+   # Applies migrations and seeds (dev):
+   npx prisma migrate dev --name init
    npx prisma db seed
    ```
 
@@ -160,12 +168,19 @@ DonorConnect provides a seamless experience across all devices:
    npm run dev
    ```
 
+6. **Run Tests**
+   ```bash
+   npm run test          # run unit/integration tests (vitest)
+   npm run test:db       # run DB-specific tests
+   npm run test:ai       # run AI-related tests
+   ```
+
 6. **Access Application**
    Open http://localhost:3000 in your browser
 
 ### **Production Deployment**
 - Compatible with Vercel, Netlify, and other Next.js hosting platforms
-- Supports PostgreSQL for production database scaling
+- Recommended production database: PostgreSQL (or managed provider)
 - Environment variables required: `OPENAI_API_KEY`, `DATABASE_URL`
 
 ## 📁 Enhanced Project Structure
