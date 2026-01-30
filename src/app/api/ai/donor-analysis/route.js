@@ -10,6 +10,22 @@ const openai = OPENAI_API_KEY ? new OpenAI({
   dangerouslyAllowBrowser: process.env.NODE_ENV === 'test'
 }) : null
 
+// PII masking helpers
+function maskEmail(email) {
+  if (!email) return 'Not provided'
+  const parts = email.split('@')
+  if (parts.length !== 2) return 'Not provided'
+  const local = parts[0]
+  const domain = parts[1]
+  return `${local[0] || '*'}***@${domain}`
+}
+
+function maskPhone(phone) {
+  if (!phone) return 'Not provided'
+  // Keep last 4 digits only
+  return phone.replace(/\d(?=\d{4})/g, '*')
+}
+
 export async function POST(request) {
   try {
     const { donorId, type } = await request.json()
@@ -57,91 +73,98 @@ export async function POST(request) {
     let prompt = ''
     let analysis = ''
 
+    // pii protection: mask contact PII before including in any external prompts or responses
+    const safeContact = {
+      email: maskEmail(donor.email),
+      phone: maskPhone(donor.phone),
+      location: donor.city ? `${donor.city}, ${donor.state}` : 'Not provided'
+    }
+
     switch (type) {
       case 'engagement_strategy':
         prompt = `Based on this donor profile, suggest a personalized engagement strategy:
         
-Donor: ${donor.firstName} ${donor.lastName}
-Email: ${donor.email || 'Not provided'}
-Phone: ${donor.phone || 'Not provided'}
-Location: ${donor.city ? `${donor.city}, ${donor.state}` : 'Not provided'}
-Donor Type: ${donor.donorType}
-Preferred Contact: ${donor.preferredContact}
-Total Donations: ${donorSummary.totalDonations}
-Total Amount: $${donorSummary.totalAmount}
-Average Gift: $${donorSummary.averageGift.toFixed(2)}
-Days Since Last Gift: ${donorSummary.daysSinceLastDonation || 'Never donated'}
-Donation Frequency: ${donorSummary.donationFrequency}
-Campaign Participation: ${donorSummary.campaignParticipation} campaigns
-Event Participation: ${donorSummary.eventParticipation} events
-Follow-up History: ${donorSummary.followUpHistory} interactions
-Notes: ${donor.notes || 'None'}
+      Donor: ${donor.firstName} ${donor.lastName}
+      Email: ${safeContact.email}
+      Phone: ${safeContact.phone}
+      Location: ${safeContact.location}
+      Donor Type: ${donor.donorType}
+      Preferred Contact: ${donor.preferredContact}
+      Total Donations: ${donorSummary.totalDonations}
+      Total Amount: $${donorSummary.totalAmount}
+      Average Gift: $${donorSummary.averageGift.toFixed(2)}
+      Days Since Last Gift: ${donorSummary.daysSinceLastDonation || 'Never donated'}
+      Donation Frequency: ${donorSummary.donationFrequency}
+      Campaign Participation: ${donorSummary.campaignParticipation} campaigns
+      Event Participation: ${donorSummary.eventParticipation} events
+      Follow-up History: ${donorSummary.followUpHistory} interactions
+      Notes: ${donor.notes || 'None'}
 
-Provide a concise, actionable engagement strategy. Format your response in markdown with:
-- Use ## headers for main sections
-- Use **bold** for key points
-- Use numbered lists (1., 2., 3.) for sequential steps
-- Use bullet points for lists of items
+      Provide a concise, actionable engagement strategy. Format your response in markdown with:
+      - Use ## headers for main sections
+      - Use **bold** for key points
+      - Use numbered lists (1., 2., 3.) for sequential steps
+      - Use bullet points for lists of items
 
-Focus on:
-1. Recommended next steps (considering their preferred contact method)
-2. Optimal communication timing
-3. Suggested donation ask amount
-4. Relationship building opportunities`
+      Focus on:
+      1. Recommended next steps (considering their preferred contact method)
+      2. Optimal communication timing
+      3. Suggested donation ask amount
+      4. Relationship building opportunities`
         break
 
       case 'risk_assessment':
         prompt = `Analyze the lapse risk for this donor and provide specific recommendations:
         
-Donor Profile:
-Name: ${donor.firstName} ${donor.lastName}
-Donor Type: ${donor.donorType}
-Location: ${donor.city ? `${donor.city}, ${donor.state}` : 'Not provided'}
-Total Donations: ${donorSummary.totalDonations}
-Total Given: $${donorSummary.totalAmount}
-Days Since Last Gift: ${donorSummary.daysSinceLastDonation || 'No donations'}
-Frequency Pattern: ${donorSummary.donationFrequency}
-Engagement Level: ${donorSummary.followUpHistory} follow-ups
-Campaign Participation: ${donorSummary.campaignParticipation} campaigns
-Event Participation: ${donorSummary.eventParticipation} events
-Notes: ${donor.notes || 'None'}
+      Donor Profile:
+      Name: ${donor.firstName} ${donor.lastName}
+      Donor Type: ${donor.donorType}
+      Location: ${safeContact.location}
+      Total Donations: ${donorSummary.totalDonations}
+      Total Given: $${donorSummary.totalAmount}
+      Days Since Last Gift: ${donorSummary.daysSinceLastDonation || 'No donations'}
+      Frequency Pattern: ${donorSummary.donationFrequency}
+      Engagement Level: ${donorSummary.followUpHistory} follow-ups
+      Campaign Participation: ${donorSummary.campaignParticipation} campaigns
+      Event Participation: ${donorSummary.eventParticipation} events
+      Notes: ${donor.notes || 'None'}
 
-Assess the risk level (Low/Medium/High) and provide your analysis in markdown format:
-- Use ## for section headers
-- Use **bold** for the risk level and key terms
-- Use bullet points for lists
-- Use numbered lists for action items
+      Assess the risk level (Low/Medium/High) and provide your analysis in markdown format:
+      - Use ## for section headers
+      - Use **bold** for the risk level and key terms
+      - Use bullet points for lists
+      - Use numbered lists for action items
 
-Provide:
-1. Risk factors identified
-2. Recommended intervention timeline
-3. Specific retention strategies`
+      Provide:
+      1. Risk factors identified
+      2. Recommended intervention timeline
+      3. Specific retention strategies`
         break
 
       case 'upgrade_potential':
         prompt = `Evaluate this donor's potential for gift upgrades:
         
-Current Profile:
-Name: ${donor.firstName} ${donor.lastName}
-Donor Type: ${donor.donorType}
-Location: ${donor.city ? `${donor.city}, ${donor.state}` : 'Not provided'}
-Donation History: ${donorSummary.totalDonations} gifts totaling $${donorSummary.totalAmount}
-Average Gift: $${donorSummary.averageGift.toFixed(2)}
-Giving Pattern: ${donorSummary.donationFrequency}
-Campaign Engagement: ${donorSummary.campaignParticipation > 0 ? 'Active' : 'Limited'}
-Event Participation: ${donorSummary.eventParticipation} events
-Notes: ${donor.notes || 'None'}
+      Current Profile:
+      Name: ${donor.firstName} ${donor.lastName}
+      Donor Type: ${donor.donorType}
+      Location: ${safeContact.location}
+      Donation History: ${donorSummary.totalDonations} gifts totaling $${donorSummary.totalAmount}
+      Average Gift: $${donorSummary.averageGift.toFixed(2)}
+      Giving Pattern: ${donorSummary.donationFrequency}
+      Campaign Engagement: ${donorSummary.campaignParticipation > 0 ? 'Active' : 'Limited'}
+      Event Participation: ${donorSummary.eventParticipation} events
+      Notes: ${donor.notes || 'None'}
 
-Provide upgrade assessment in well-formatted markdown:
-- Use ## headers for main sections
-- Use **bold** for key metrics and recommendations
-- Use bullet points and numbered lists
+      Provide upgrade assessment in well-formatted markdown:
+      - Use ## headers for main sections
+      - Use **bold** for key metrics and recommendations
+      - Use bullet points and numbered lists
 
-Include:
-1. Upgrade likelihood (Low/Medium/High)
-2. Suggested ask amount
-3. Best approach strategy
-4. Timing recommendations`
+      Include:
+      1. Upgrade likelihood (Low/Medium/High)
+      2. Suggested ask amount
+      3. Best approach strategy
+      4. Timing recommendations`
         break
 
       default:
@@ -157,7 +180,6 @@ Include:
     // Log configuration status (without exposing full key)
     logger.info('OpenAI Configuration Check', {
       hasKey: !!OPENAI_KEY,
-      keyPrefix: OPENAI_KEY ? OPENAI_KEY.substring(0, 10) + '...' : 'none',
       modelsToTry: MODELS_TO_TRY,
       clientInitialized: !!openai
     })
@@ -257,7 +279,8 @@ Include:
       donor: {
         id: donor.id,
         name: `${donor.firstName} ${donor.lastName}`,
-        email: donor.email
+        // pii protection: return masked email, not raw PII
+        email: safeContact.email
       },
       analysisType: type,
       summary: donorSummary,
