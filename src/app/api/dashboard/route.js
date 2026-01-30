@@ -47,6 +47,49 @@ export async function GET() {
       orderBy: { donationDate: 'asc' }
     })
 
+    // Get donations for last 12 months and aggregate by month (YYYY-MM)
+    const oneYearAgo = new Date()
+    oneYearAgo.setMonth(oneYearAgo.getMonth() - 12)
+
+    const lastYearDonations = await prisma.donation.findMany({
+      where: {
+        donationDate: {
+          gte: oneYearAgo
+        }
+      },
+      select: {
+        amount: true,
+        donationDate: true
+      },
+      orderBy: { donationDate: 'asc' }
+    })
+
+    const monthlyAggregates = {}
+    lastYearDonations.forEach(d => {
+      const month = d.donationDate.toISOString().substr(0, 7) // YYYY-MM
+      monthlyAggregates[month] = (monthlyAggregates[month] || 0) + (d.amount || 0)
+    })
+
+    const donationTrendsMonthly = Object.keys(monthlyAggregates).sort().map(month => ({ month, amount: monthlyAggregates[month] }))
+
+    // If there are no donations in the last 12 months (e.g., seeded data older than 12 months),
+    // fall back to aggregating across all donations so charts reflect existing DB totals.
+    if (donationTrendsMonthly.length === 0) {
+      const allDonations = await prisma.donation.findMany({ select: { amount: true, donationDate: true }, orderBy: { donationDate: 'asc' } })
+      const allMonthly = {}
+      allDonations.forEach(d => {
+        const month = d.donationDate.toISOString().substr(0, 7)
+        allMonthly[month] = (allMonthly[month] || 0) + (d.amount || 0)
+      })
+      // overwrite donationTrendsMonthly with full-range aggregates
+      Object.keys(allMonthly).sort()
+      // convert to array
+      const fallback = Object.keys(allMonthly).sort().map(month => ({ month, amount: allMonthly[month] }))
+      // assign to donationTrendsMonthly variable used below
+      // (we can't reassign const, so build a new variable name and use that in the return)
+      var donationTrendsMonthlyFallback = fallback
+    }
+
     // Get top donors
     const topDonors = await prisma.donor.findMany({
       include: {
@@ -84,26 +127,33 @@ export async function GET() {
       status: campaign.status
     }))
 
-    // Get donor growth (last 6 months)
-    const sixMonthsAgo = new Date()
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
-    
-    const donorGrowth = await prisma.donor.groupBy({
-      by: ['createdAt'],
+    // Get donor growth (last 12 months) and aggregate by month
+    const donorOneYearAgo = new Date()
+    donorOneYearAgo.setMonth(donorOneYearAgo.getMonth() - 12)
+
+    const donorsLastYear = await prisma.donor.findMany({
       where: {
         createdAt: {
-          gte: sixMonthsAgo
+          gte: donorOneYearAgo
         }
       },
-      _count: true,
+      select: { createdAt: true }
     })
 
-    // Process donor growth data by month
     const monthlyGrowth = {}
-    donorGrowth.forEach(item => {
-      const month = item.createdAt.toISOString().substr(0, 7) // YYYY-MM format
-      monthlyGrowth[month] = (monthlyGrowth[month] || 0) + item._count
+    donorsLastYear.forEach(d => {
+      const month = d.createdAt.toISOString().substr(0, 7)
+      monthlyGrowth[month] = (monthlyGrowth[month] || 0) + 1
     })
+
+    // Aggregate donations by year for multi-year views
+    const donationsAll = await prisma.donation.findMany({ select: { amount: true, donationDate: true }, orderBy: { donationDate: 'asc' } })
+    const yearAggregates = {}
+    donationsAll.forEach(d => {
+      const year = d.donationDate.getFullYear()
+      yearAggregates[year] = (yearAggregates[year] || 0) + (d.amount || 0)
+    })
+    const donationTrendsYearly = Object.keys(yearAggregates).sort().map(y => ({ year: Number(y), amount: yearAggregates[y] }))
 
     logger.info('Dashboard snapshot', {
       totalDonors,
@@ -126,7 +176,10 @@ export async function GET() {
       recentDonations,
       topDonors: donorsWithTotals,
       campaignPerformance: campaignsWithStats,
+      // raw recent donations (last 30 days), monthly aggregates for last 12 months, and donor growth by month
       donationTrends: monthlyDonations,
+      donationTrendsMonthly: donationTrendsMonthly.length ? donationTrendsMonthly : (donationTrendsMonthlyFallback || []),
+      donationTrendsYearly,
       donorGrowth: Object.entries(monthlyGrowth).map(([month, count]) => ({
         month,
         count

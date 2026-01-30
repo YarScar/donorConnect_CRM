@@ -1,8 +1,9 @@
-'use client'
+"use client"
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import Charts from '@/components/Charts'
 
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null)
@@ -111,6 +112,15 @@ export default function Dashboard() {
             </div>
           </div>
         </section>
+        {/* Charts placed immediately under summary cards */}
+        <Charts
+          donationTrends={dashboardData?.donationTrends || []}
+          donationTrendsMonthly={dashboardData?.donationTrendsMonthly || []}
+          donationTrendsYearly={dashboardData?.donationTrendsYearly || []}
+          donorGrowth={dashboardData?.donorGrowth || []}
+          campaignPerformance={dashboardData?.campaignPerformance || []}
+          topDonors={dashboardData?.topDonors || []}
+        />
 
         {/* Recent Activity and Top Donors */}
         <section className="content-grid">
@@ -262,6 +272,7 @@ export default function Dashboard() {
             </div>
           </div>
         </section>
+
 
         {/* Quick Actions */}
         <section className="quick-actions">
