@@ -1,9 +1,12 @@
+// AI analysis route - provides server-side donor analysis using OpenAI while
+// taking precautions to avoid leaking PII. See comments marked "pii protection".
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import OpenAI from 'openai'
 import { logger } from '@/lib/logger'
 
-// Initialize OpenAI client
+// Initialize OpenAI client using server-side API key (never exposed to browser)
+// The `openai` client is only created when an API key is provided in env.
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 const openai = OPENAI_API_KEY ? new OpenAI({
   apiKey: OPENAI_API_KEY,
@@ -11,26 +14,31 @@ const openai = OPENAI_API_KEY ? new OpenAI({
 }) : null
 
 // PII masking helpers
+// PII masking helpers - used to avoid sending raw contact data to external services
 function maskEmail(email) {
   if (!email) return 'Not provided'
   const parts = email.split('@')
   if (parts.length !== 2) return 'Not provided'
   const local = parts[0]
   const domain = parts[1]
+  // Keep only first character of local part and mask the rest
   return `${local[0] || '*'}***@${domain}`
 }
 
 function maskPhone(phone) {
   if (!phone) return 'Not provided'
-  // Keep last 4 digits only
+  // Replace all but last 4 digits with '*' (keeps last 4 visible for reference)
   return phone.replace(/\d(?=\d{4})/g, '*')
 }
 
 export async function POST(request) {
   try {
     const { donorId, type } = await request.json()
+    // Input validation: donorId expected from client-side request body
 
-    // Fetch donor data
+    // Retrieve donor and related records from the database using server-side
+    // Prisma client. This query runs only on the server and never exposes DB
+    // credentials to the browser.
     const donor = await prisma.donor.findUnique({
       where: { id: parseInt(donorId) },
       include: {
@@ -54,7 +62,8 @@ export async function POST(request) {
       )
     }
 
-    // Prepare data for AI analysis
+    // Build an aggregated, non-PII summary used for analysis. This contains
+    // numeric and categorical metrics which are safe to include in prompts.
     const donorSummary = {
       totalDonations: donor.donations.length,
       totalAmount: donor.donations.reduce((sum, d) => sum + d.amount, 0),
@@ -73,7 +82,9 @@ export async function POST(request) {
     let prompt = ''
     let analysis = ''
 
-    // pii protection: mask contact PII before including in any external prompts or responses
+    // pii protection: mask contact PII before including in any external prompts
+    // or responses. The masked values are intentionally conservative to reduce
+    // exposure while preserving minimal context (e.g., domain, last 4 digits).
     const safeContact = {
       email: maskEmail(donor.email),
       phone: maskPhone(donor.phone),
@@ -171,13 +182,14 @@ export async function POST(request) {
         analysis = generateBasicAnalysis(donor, donorSummary)
     }
 
-    // Validate OpenAI configuration - REQUIRE real AI, no mock fallback
+    // Validate OpenAI configuration: if there is no API key, we cannot call
+    // external models and must surface an error to the client.
     const OPENAI_KEY = process.env.OPENAI_API_KEY
     
-    // Try multiple models in order of preference
+    // Try several available models and log a minimal configuration check.
+    // We avoid logging any key material (no key prefixes).
     const MODELS_TO_TRY = ['gpt-4o-mini', 'gpt-3.5-turbo', 'gpt-4o', 'gpt-4-turbo']
-    
-    // Log configuration status (without exposing full key)
+
     logger.info('OpenAI Configuration Check', {
       hasKey: !!OPENAI_KEY,
       modelsToTry: MODELS_TO_TRY,
@@ -205,10 +217,12 @@ export async function POST(request) {
     let usedModel = ''
     let lastError = null
 
+    // Attempt to call each model in turn until one succeeds. We log high-level
+    // events (attempt, success, warning) but avoid logging model outputs.
     for (const model of MODELS_TO_TRY) {
       try {
         logger.info('Attempting OpenAI API call', { model, donorId })
-        
+
         const completion = await openai.chat.completions.create({
           model: model,
           messages: [
@@ -225,20 +239,22 @@ export async function POST(request) {
           temperature: 0.7
         })
 
+        // Extract analysis text from provider response
         analysis = completion.choices[0].message.content
         usedModel = model
         logger.info('OpenAI API call successful', { donorId, model, responseLength: analysis.length })
-        break // Success! Exit the loop
-        
+        break // Success: stop trying further models
+
       } catch (modelError) {
+        // Track the failure and try the next available model for resiliency
         lastError = modelError
         logger.warn('Model not available, trying next', { 
           model, 
           error: modelError.message,
           status: modelError.status 
         })
-        
-        // If it's not a model access issue, stop trying
+
+        // If failure is not an access error, abort the retry loop
         if (modelError.status !== 403 && modelError.status !== 404) {
           break
         }
@@ -275,6 +291,8 @@ export async function POST(request) {
       }, { status: 500 })
     }
 
+    // Return results to the client. We intentionally return masked contact
+    // information to avoid exposing raw PII in API responses.
     return NextResponse.json({
       donor: {
         id: donor.id,
