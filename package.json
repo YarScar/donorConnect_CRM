@@ -14,6 +14,9 @@
     "test:ai": "vitest run --config vitest.config.ai.js",
     "db:test:setup": "cross-env NODE_ENV=test npx prisma migrate dev && npx prisma db seed"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "dependencies": {
     "@prisma/client": "^5.7.0",
     "bcryptjs": "^3.0.3",
@@ -33,13 +36,10 @@
     "@types/bcryptjs": "^2.4.6",
     "@vitejs/plugin-react": "^4.2.1",
     "cross-env": "^7.0.3",
-    "eslint": "^8.54.0",
-    "eslint-config-next": "^14.0.0",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.1.6",
     "jsdom": "^23.2.0",
     "supertest": "^6.3.3",
-    "vitest": "^1.2.0"
-  },
-  "prisma": {
-    "seed": "node prisma/seed.js"
+    "vitest": "^4.0.18"
   }
 }
