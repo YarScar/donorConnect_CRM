@@ -22,18 +22,30 @@ export default function AIPolicy() {
           </div>
         </section>
 
+        <section className="implementation-note">
+          <h2>🧾 Implementation Notes</h2>
+          <div className="note-card">
+            <p>Key implementation details and where to inspect them in code:</p>
+            <ul>
+              <li>PII masking for AI prompts and responses: see <strong>src/app/api/ai/donor-analysis/route.js</strong> (look for the comment "pii protection").</li>
+              <li>Charts and analytics source data: see <strong>src/app/api/dashboard/route.js</strong> (monthly and yearly aggregates for charts).</li>
+              <li>Prisma DB access and schema: see <strong>prisma/schema.prisma</strong> and <strong>src/lib/prisma.js</strong>.</li>
+            </ul>
+          </div>
+        </section>
+
         <section className="ai-features">
           <h2>🔧 AI Models and APIs Used</h2>
           
           <div className="feature-grid">
             <div className="feature-card">
-              <h3>📊 OpenAI GPT-3.5 Turbo</h3>
+              <h3>📊 OpenAI (official SDK)</h3>
               <div className="feature-details">
                 <p><strong>Primary Use:</strong> Donor analysis and engagement strategy generation</p>
-                <p><strong>Model Version:</strong> gpt-3.5-turbo (Latest stable version)</p>
-                <p><strong>API Provider:</strong> OpenAI</p>
-                <p><strong>Data Processing:</strong> All donor data is anonymized before AI analysis</p>
-                <p><strong>Retention Policy:</strong> No data is retained by OpenAI per our API configuration</p>
+                <p><strong>Models:</strong> We attempt multiple models (example: gpt-4o-mini, gpt-3.5-turbo, gpt-4o, gpt-4-turbo) depending on availability</p>
+                <p><strong>API Provider:</strong> OpenAI (access via the `openai` npm SDK)</p>
+                <p><strong>Data Processing:</strong> Contact fields (email, phone) are masked before sending to external AI; aggregated donor metrics are provided to the model. See implementation note below.</p>
+                <p><strong>Retention Policy:</strong> We do not persist provider responses in the database by default; external provider retention policies may still apply — mask data before sending to providers to reduce exposure.</p>
               </div>
             </div>
 
@@ -42,8 +54,8 @@ export default function AIPolicy() {
               <div className="feature-details">
                 <p><strong>Function:</strong> Local algorithms for risk assessment and giving pattern analysis</p>
                 <p><strong>Implementation:</strong> JavaScript-based calculations within our application</p>
-                <p><strong>Data Source:</strong> Only aggregated donation history and engagement metrics</p>
-                <p><strong>Privacy:</strong> 100% local processing, no external API calls</p>
+                <p><strong>Data Source:</strong> Aggregated donation history and engagement metrics (processed server-side)</p>
+                <p><strong>Privacy:</strong> Local processing where possible; no external API calls for these calculations</p>
               </div>
             </div>
           </div>
@@ -56,11 +68,10 @@ export default function AIPolicy() {
             <div className="principle-card transparency">
               <h3>🔍 Transparency</h3>
               <ul>
-                <li>All AI recommendations clearly labeled as AI-generated</li>
-                <li>Confidence scores provided with each suggestion</li>
-                <li>Data sources cited for every recommendation</li>
-                <li>Users can always see why a recommendation was made</li>
-                <li>"Explain this recommendation" feature available for all AI insights</li>
+                <li>All AI recommendations are labeled as AI-generated</li>
+                <li>Rationales or explanations are provided where feasible; numeric confidence scores are not currently provided by all models</li>
+                <li>Key data sources (aggregated donor metrics) are cited for each recommendation</li>
+                <li>Users can request clarification on why a recommendation was made (where supported by the UI and model response)</li>
               </ul>
             </div>
 
@@ -78,11 +89,11 @@ export default function AIPolicy() {
             <div className="principle-card privacy">
               <h3>🔒 Privacy Protection</h3>
               <ul>
-                <li>Donor personally identifiable information (PII) is never sent to external AI services</li>
-                <li>Data anonymization before any AI processing</li>
-                <li>Compliance with nonprofit privacy best practices</li>
-                <li>Local data processing whenever possible</li>
-                <li>Regular privacy impact assessments</li>
+                <li>Contact PII (email, phone) is masked before being sent to external AI services; names may still be included unless configured otherwise in settings</li>
+                <li>Data masking/anonymization of contact fields is applied prior to external AI calls (see implementation note below)</li>
+                <li>We follow nonprofit privacy best practices and recommend reviewing deployment-level encryption and provider settings</li>
+                <li>Local processing is preferred for calculation-based features (e.g., pattern detection, risk scoring)</li>
+                <li>Regular privacy impact assessments are recommended and should be performed by deployers</li>
               </ul>
             </div>
 
@@ -198,19 +209,20 @@ export default function AIPolicy() {
           <h2>🔐 Technical Safeguards</h2>
           
           <div className="safeguards-grid">
+
             <div className="safeguard-item">
               <h3>🔒 Data Encryption</h3>
-              <p>All donor data is encrypted at rest and in transit. AI analysis uses hashed identifiers instead of names or email addresses.</p>
+              <p>Data in transit uses TLS; at-rest encryption depends on your deployment (cloud provider or database configuration). AI analysis uses masked contact fields rather than raw email/phone. Review your hosting provider's encryption settings for full compliance.</p>
             </div>
 
             <div className="safeguard-item">
               <h3>⏱️ Session Limits</h3>
-              <p>AI API calls are rate-limited and sessions expire after 24 hours to prevent data accumulation.</p>
+              <p>Rate limiting and session management are recommended for production deployments to prevent unwanted data accumulation; configure these at the API gateway or hosting layer.</p>
             </div>
 
             <div className="safeguard-item">
               <h3>🚫 Data Retention Controls</h3>
-              <p>No donor data is stored by external AI providers. All processing is ephemeral and deleted immediately after analysis.</p>
+              <p>We do not persist AI provider responses by default. External provider retention and logging policies are governed by the provider (OpenAI). To reduce exposure, we mask PII before sending and recommend configuring provider-side data-use settings where available.</p>
             </div>
 
             <div className="safeguard-item">
